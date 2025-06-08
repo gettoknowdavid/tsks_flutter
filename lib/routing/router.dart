@@ -4,7 +4,10 @@ import 'package:tsks_flutter/ui/pages/pages.dart';
 
 part 'router.g.dart';
 
-final routerConfig = GoRouter(routes: $appRoutes);
+final routerConfig = GoRouter(
+  // initialLocation: const SignInRoute().location,
+  routes: $appRoutes,
+);
 
 @TypedGoRoute<LandingRoute>(path: '/landing', name: 'Landing')
 final class LandingRoute extends GoRouteData with _$LandingRoute {

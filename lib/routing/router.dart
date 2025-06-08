@@ -5,7 +5,7 @@ import 'package:tsks_flutter/ui/pages/pages.dart';
 part 'router.g.dart';
 
 final routerConfig = GoRouter(
-  // initialLocation: const SignInRoute().location,
+  initialLocation: const SignInRoute().location,
   routes: $appRoutes,
 );
 

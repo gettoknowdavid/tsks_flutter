@@ -14,6 +14,8 @@ final class UserDto with EquatableMixin {
     );
   }
 
+  static UserDto empty = UserDto(id: '', fullName: '', email: '');
+
   const UserDto({
     required this.id,
     required this.fullName,

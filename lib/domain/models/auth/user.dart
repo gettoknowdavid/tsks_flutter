@@ -10,6 +10,12 @@ final class User with EquatableMixin {
     this.emailVerified = false,
   });
 
+  static User empty = User(
+    id: Id.fromString(''),
+    fullName: SingleLineString(''),
+    email: Email(''),
+  );
+
   final Id id;
   final SingleLineString fullName;
   final Email email;

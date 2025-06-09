@@ -3,13 +3,6 @@ import 'package:tsks_flutter/domain/core/exceptions/value_exception.dart';
 import 'package:tsks_flutter/domain/core/value_objects/value_object.dart';
 
 final class Password extends ValueObject<String> {
-  /// Default class for use with Sign In form
-  static Password emptySignIn = Password('', PasswordMode.signIn);
-
-  /// Default class for use with Sign Up form
-  static Password emptySignUp = Password('', PasswordMode.signUp);
-
-  final PasswordMode mode;
 
   factory Password(String input, [PasswordMode mode = PasswordMode.signIn]) {
     final sanitizedInput = input.trim();
@@ -18,6 +11,13 @@ final class Password extends ValueObject<String> {
   }
 
   const Password._(super.value, this.mode);
+  /// Default class for use with Sign In form
+  static Password emptySignIn = Password('');
+
+  /// Default class for use with Sign Up form
+  static Password emptySignUp = Password('', PasswordMode.signUp);
+
+  final PasswordMode mode;
 
   static Either<ValueException<String>, String> _validatePassword(
     String input, {

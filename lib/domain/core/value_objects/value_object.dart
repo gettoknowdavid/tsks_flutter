@@ -9,12 +9,12 @@ abstract class IValueObject {
 
 @immutable
 abstract class ValueObject<T> with EquatableMixin implements IValueObject {
-  /// The core state: the result of validation, stored immutably.
-  final Either<ValueException<T>, T> value;
 
   /// Base constructor takes the pre-validated Either result.
   /// Can be const, allowing subclasses to define const constructors.
   const ValueObject(this.value);
+  /// The core state: the result of validation, stored immutably.
+  final Either<ValueException<T>, T> value;
 
   /// Returns the failure object [ValueException] if validation failed
   /// (isLeft), otherwise null.

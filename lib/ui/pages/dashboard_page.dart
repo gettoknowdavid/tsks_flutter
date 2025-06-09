@@ -5,6 +5,6 @@ class DashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Column(children: [Text('Dashboard Page')]));
+    return const Scaffold(body: Column(children: [Text('Dashboard Page')]));
   }
 }

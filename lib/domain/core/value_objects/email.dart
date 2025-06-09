@@ -9,7 +9,6 @@ final _emailRegExp = RegExp(
 );
 
 class Email extends ValueObject<String> {
-  static Email empty = Email('');
 
   factory Email(String input) {
     final sanitizedInput = input.trim();
@@ -17,6 +16,7 @@ class Email extends ValueObject<String> {
   }
 
   const Email._(super.value);
+  static Email empty = Email('');
 
   static Either<ValueException<String>, String> _validateEmail(String input) {
     if (input.isEmpty) {

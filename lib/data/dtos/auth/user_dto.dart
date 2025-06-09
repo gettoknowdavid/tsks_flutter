@@ -4,6 +4,14 @@ import 'package:tsks_flutter/domain/core/value_objects/value_objects.dart';
 import 'package:tsks_flutter/domain/models/auth/user.dart';
 
 final class UserDto with EquatableMixin {
+
+  const UserDto({
+    required this.id,
+    required this.fullName,
+    required this.email,
+    this.photoURL,
+    this.emailVerified = false,
+  });
   factory UserDto.fromFirebaseUser(firebase_auth.User user) {
     return UserDto(
       id: user.uid,
@@ -14,15 +22,7 @@ final class UserDto with EquatableMixin {
     );
   }
 
-  static UserDto empty = UserDto(id: '', fullName: '', email: '');
-
-  const UserDto({
-    required this.id,
-    required this.fullName,
-    required this.email,
-    this.photoURL,
-    this.emailVerified = false,
-  });
+  static UserDto empty = const UserDto(id: '', fullName: '', email: '');
 
   final String id;
   final String fullName;

@@ -1,56 +1,56 @@
 import 'package:equatable/equatable.dart';
 
 sealed class ValueException<T> with EquatableMixin implements Exception {
+  const ValueException({required this.code, required this.message});
   final String code;
   final String message;
-  const ValueException({required this.code, required this.message});
 
   @override
   List<Object?> get props => [];
 }
 
 final class InvalidFileFormatException<T> extends ValueException<T> {
-  final T value;
 
   const InvalidFileFormatException(
     this.value, {
     super.code = 'invalid-format',
     super.message = 'The file format selected is invalid.',
   });
+  final T value;
 }
 
 final class InvalidValueException<T> extends ValueException<T> {
-  final T value;
 
   const InvalidValueException(
     this.value, {
     super.code = 'invalid-value',
     super.message = 'Invalid value.',
   });
+  final T value;
 }
 
 final class LengthExceededValueException<T> extends ValueException<T> {
-  final T value;
-
-  final int maxLength;
   const LengthExceededValueException(
     this.value, {
     this.maxLength = 244,
     super.code = 'length-exceeded',
     super.message = 'Value length exceeded.',
   });
+  final T value;
+
+  final int maxLength;
 }
 
 final class MaxLinesExceededValueException<T> extends ValueException<T> {
-  final T value;
-
-  final int maxLines;
   const MaxLinesExceededValueException(
     this.value,
     this.maxLines, {
     super.code = 'max-lines-exceeded',
     super.message = 'Number of valid lines has been exceeded.',
   });
+  final T value;
+
+  final int maxLines;
 }
 
 final class RequiredValueException<T> extends ValueException<T> {

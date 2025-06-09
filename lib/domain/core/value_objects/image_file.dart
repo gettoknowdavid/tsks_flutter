@@ -5,9 +5,6 @@ import 'package:tsks_flutter/domain/core/exceptions/value_exception.dart';
 import 'package:tsks_flutter/domain/core/value_objects/value_object.dart';
 
 class ImageFile extends ValueObject<File?> {
-  static ImageFile empty = ImageFile(null);
-
-  static final _allowedExtensions = ['jpg', 'jpeg', 'png'];
 
   factory ImageFile(File? input) {
     final validationResult = _validateFile(input);
@@ -15,6 +12,9 @@ class ImageFile extends ValueObject<File?> {
   }
 
   const ImageFile._(super.input);
+  static ImageFile empty = ImageFile(null);
+
+  static final _allowedExtensions = ['jpg', 'jpeg', 'png'];
 
   static Either<ValueException<File?>, File?> _validateFile(File? input) {
     if (input == null) return const Right(null);

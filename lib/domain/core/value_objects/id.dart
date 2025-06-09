@@ -4,7 +4,6 @@ import 'package:tsks_flutter/domain/core/value_objects/value_object.dart';
 import 'package:uuid/uuid.dart';
 
 final class Id extends ValueObject<String> {
-  static Id empty = Id.fromString('');
 
   factory Id() {
     final uuidString = const Uuid().v4();
@@ -17,6 +16,7 @@ final class Id extends ValueObject<String> {
   }
 
   const Id._(super.value);
+  static Id empty = Id.fromString('');
 
   static Either<ValueException<String>, String> _validate(String input) {
     final sanitizedInput = input.trim();

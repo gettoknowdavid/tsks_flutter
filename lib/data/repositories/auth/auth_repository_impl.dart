@@ -7,10 +7,10 @@ import 'package:tsks_flutter/domain/core/value_objects/value_objects.dart';
 import 'package:tsks_flutter/domain/models/auth/user.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  final firebase_auth.FirebaseAuth _firebaseAuth;
 
   const AuthRepositoryImpl({required firebase_auth.FirebaseAuth firebaseAuth})
     : _firebaseAuth = firebaseAuth;
+  final firebase_auth.FirebaseAuth _firebaseAuth;
 
   @override
   User get user {
@@ -40,7 +40,7 @@ class AuthRepositoryImpl implements AuthRepository {
         email: email.getOrCrash,
         password: password.getOrCrash,
       );
-      return Right(unit);
+      return const Right(unit);
     } on firebase_auth.FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'user-not-found':
@@ -54,7 +54,7 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(TsksException(e.toString()));
     }
   }
-  
+
   @override
   Future<void> signOut() => _firebaseAuth.signOut();
 
@@ -80,7 +80,7 @@ class AuthRepositoryImpl implements AuthRepository {
             case 'invalid-email':
               return const EmailAlreadyInUseException();
             case 'weak-password':
-              return TsksException('Password is too weak.');
+              return const TsksException('Password is too weak.');
             default:
               return TsksException(error.message ?? 'Unknown Firebase error');
           }
@@ -89,7 +89,7 @@ class AuthRepositoryImpl implements AuthRepository {
       },
     );
 
-    final TaskEither<TsksException, Unit> resultTask = createUserTask.flatMap((
+    final resultTask = createUserTask.flatMap<Unit>((
       credential,
     ) {
       final newUser = credential.user;
@@ -108,6 +108,6 @@ class AuthRepositoryImpl implements AuthRepository {
       return reloadUserTask.flatMap((_) => updateUserDisplayName);
     });
 
-    return await resultTask.run();
+    return resultTask.run();
   }
 }

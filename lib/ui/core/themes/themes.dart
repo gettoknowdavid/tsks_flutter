@@ -8,7 +8,7 @@ abstract final class TsksTheme {
   static ThemeData darkTheme = _rawTheme(TsksColors.darkColorScheme);
 
   static ThemeData _rawTheme(ColorScheme colorScheme) {
-    var baseTheme = ThemeData(
+    final baseTheme = ThemeData(
       brightness: colorScheme.brightness,
       colorScheme: colorScheme,
     );

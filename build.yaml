@@ -3,4 +3,4 @@ targets:
     builders:
       go_router_builder:
         generate_for:
-          - lib/routing/router.dart
+          - lib/routing/router_notifier.dart

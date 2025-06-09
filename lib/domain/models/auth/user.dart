@@ -6,16 +6,16 @@ final class User with EquatableMixin {
     required this.id,
     required this.fullName,
     required this.email,
-    this.imageUrl,
-    this.isEmailVerified = false,
+    this.photoURL,
+    this.emailVerified = false,
   });
 
   final Id id;
   final SingleLineString fullName;
   final Email email;
-  final String? imageUrl;
-  final bool isEmailVerified;
+  final String? photoURL;
+  final bool emailVerified;
 
   @override
-  List<Object?> get props => [id, fullName, email, imageUrl, isEmailVerified];
+  List<Object?> get props => [id, fullName, email, photoURL, emailVerified];
 }

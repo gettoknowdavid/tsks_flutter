@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:responsive_framework/responsive_framework.dart';
+import 'package:tsks_flutter/routing/router_notifier.dart';
 import 'package:tsks_flutter/ui/widgets/facebook_sign_in_button.dart';
 import 'package:tsks_flutter/ui/widgets/google_sign_in_button.dart';
 import 'package:tsks_flutter/ui/widgets/sign_up_form_widget.dart';
@@ -13,6 +14,7 @@ class SignUpPage extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final textTheme = theme.textTheme;
+    
     return Scaffold(
       body: MaxWidthBox(
         maxWidth: 420,
@@ -60,7 +62,13 @@ class SignUpPage extends StatelessWidget {
               const SizedBox(height: 50),
               Center(
                 child: TextButton.icon(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () {
+                    if (Navigator.canPop(context)) {
+                      Navigator.maybePop(context);
+                    } else {
+                      const SignInRoute().push<void>(context);
+                    }
+                  },
                   icon: const Icon(PhosphorIconsRegular.caretLeft),
                   style: TextButton.styleFrom(
                     foregroundColor: colors.onSurfaceVariant,

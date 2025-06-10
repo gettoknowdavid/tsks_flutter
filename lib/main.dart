@@ -10,6 +10,7 @@ import 'package:tsks_flutter/firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
   if (kIsWeb) {
     GoRouter.optionURLReflectsImperativeAPIs = true;
     usePathUrlStrategy();
@@ -19,6 +20,7 @@ Future<void> main() async {
     final license = await rootBundle.loadString('assets/fonts/OFL.txt');
     yield LicenseEntryWithLineBreaks(['google_fonts'], license);
   });
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(const ProviderScope(child: TsksApp()));

@@ -2,7 +2,7 @@ part of 'router_notifier.dart';
 
 final class TsksRouterState with EquatableMixin {
   const TsksRouterState()
-    : this._(redirectPath: '/loading', allowedPath: const []);
+    : this._(redirectPath: '/', allowedPath: const []);
 
   const TsksRouterState._({
     required this.redirectPath,
@@ -10,7 +10,7 @@ final class TsksRouterState with EquatableMixin {
   });
 
   TsksRouterState loading() => const TsksRouterState._(
-    redirectPath: '/loading',
+    redirectPath: '/',
     allowedPath: [],
   );
 

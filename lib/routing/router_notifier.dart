@@ -10,15 +10,18 @@ import 'package:tsks_flutter/ui/providers/auth/auth.dart';
 part 'router_notifier.g.dart';
 part 'router_state.dart';
 
+final navigatorKey = GlobalKey<NavigatorState>();
+
 @Riverpod(keepAlive: true)
 GoRouter routerConfig(Ref ref) {
-  final tsksRouterNotifier = ref.watch(tsksRouterProvider); 
+  final tsksRouterNotifier = ref.watch(tsksRouterProvider);
   return GoRouter(
+    navigatorKey: navigatorKey,
     initialLocation: const SignInRoute().location,
     routes: $appRoutes,
-    refreshListenable: tsksRouterNotifier, 
+    refreshListenable: tsksRouterNotifier,
     redirect: (context, routerState) {
-      final allowedPaths = tsksRouterNotifier.value.allowedPath; 
+      final allowedPaths = tsksRouterNotifier.value.allowedPath;
       final isAllowedPath = allowedPaths.contains(routerState.fullPath);
       return !isAllowedPath ? tsksRouterNotifier.value.redirectPath : null;
     },
@@ -50,15 +53,15 @@ class TsksRouter extends _$TsksRouter {
   }
 }
 
-@TypedGoRoute<LoadingRoute>(path: '/loading', name: 'Loading')
-final class LoadingRoute extends GoRouteData with _$LoadingRoute {
-  const LoadingRoute();
+// @TypedGoRoute<LoadingRoute>(path: '/loading', name: 'Loading')
+// final class LoadingRoute extends GoRouteData with _$LoadingRoute {
+//   const LoadingRoute();
 
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return const LoadingPage();
-  }
-}
+//   @override
+//   Widget build(BuildContext context, GoRouterState state) {
+//     return const LoadingPage();
+//   }
+// }
 
 @TypedGoRoute<LandingRoute>(path: '/landing', name: 'Landing')
 final class LandingRoute extends GoRouteData with _$LandingRoute {

@@ -1,28 +1,32 @@
 part of 'router_notifier.dart';
 
 final class TsksRouterState with EquatableMixin {
-  const TsksRouterState() : this._(redirect: '/loading', allowed: const []);
+  const TsksRouterState()
+    : this._(redirectPath: '/loading', allowedPath: const []);
 
-  const TsksRouterState._({required this.redirect, required this.allowed});
+  const TsksRouterState._({
+    required this.redirectPath,
+    required this.allowedPath,
+  });
 
   TsksRouterState loading() => const TsksRouterState._(
-    redirect: '/loading',
-    allowed: [],
+    redirectPath: '/loading',
+    allowedPath: [],
   );
 
   TsksRouterState authenticated() => const TsksRouterState._(
-    redirect: '/',
-    allowed: ['/'],
+    redirectPath: '/',
+    allowedPath: ['/'],
   );
 
   TsksRouterState unauthenticated() => const TsksRouterState._(
-    redirect: '/sign-in',
-    allowed: ['/sign-in', 'sign-out', '/landing'],
+    redirectPath: '/sign-in',
+    allowedPath: ['/sign-in', '/sign-up', '/landing'],
   );
 
-  final String redirect;
-  final List<String> allowed;
+  final String redirectPath;
+  final List<String> allowedPath;
 
   @override
-  List<Object?> get props => [redirect, allowed];
+  List<Object?> get props => [redirectPath, allowedPath];
 }

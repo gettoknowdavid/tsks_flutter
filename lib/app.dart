@@ -14,7 +14,7 @@ class TsksApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(userChangesProvider);
     ref.watch(sessionProvider);
-    final routerConfig = ref.watch(tsksRouterProvider.notifier).routerConfig;
+    final routerConfig = ref.watch(routerConfigProvider);
     return TsksAppView(routerConfig: routerConfig);
   }
 }

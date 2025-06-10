@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:tsks_flutter/domain/models/auth/user.dart';
 import 'package:tsks_flutter/ui/pages/pages.dart';
@@ -10,9 +11,24 @@ part 'router_notifier.g.dart';
 part 'router_state.dart';
 
 @Riverpod(keepAlive: true)
+GoRouter routerConfig(Ref ref) {
+  final tsksRouterNotifier = ref.watch(tsksRouterProvider); 
+  return GoRouter(
+    initialLocation: const SignInRoute().location,
+    routes: $appRoutes,
+    refreshListenable: tsksRouterNotifier, 
+    redirect: (context, routerState) {
+      final allowedPaths = tsksRouterNotifier.value.allowedPath; 
+      final isAllowedPath = allowedPaths.contains(routerState.fullPath);
+      return !isAllowedPath ? tsksRouterNotifier.value.redirectPath : null;
+    },
+  );
+}
+
+@Riverpod(keepAlive: true)
 class TsksRouter extends _$TsksRouter {
   @override
-  ValueNotifier<TsksRouterState> build() {
+  Raw<ValueNotifier<TsksRouterState>> build() {
     state = ValueNotifier(const TsksRouterState());
 
     ref.listen(userChangesProvider, (previous, next) {
@@ -32,17 +48,6 @@ class TsksRouter extends _$TsksRouter {
 
     return state;
   }
-
-  GoRouter get routerConfig => GoRouter(
-    initialLocation: const SignInRoute().location,
-    routes: $appRoutes,
-    refreshListenable: state,
-    redirect: (context, routerState) {
-      final allowedPaths = state.value.allowed;
-      final isAllowedPath = allowedPaths.contains(routerState.fullPath);
-      return !isAllowedPath ? state.value.redirect : null;
-    },
-  );
 }
 
 @TypedGoRoute<LoadingRoute>(path: '/loading', name: 'Loading')
@@ -82,5 +87,15 @@ final class SignInRoute extends GoRouteData with _$SignInRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const SignInPage();
+  }
+}
+
+@TypedGoRoute<SignUpRoute>(path: '/sign-up', name: 'Sign Up')
+final class SignUpRoute extends GoRouteData with _$SignUpRoute {
+  const SignUpRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const SignUpPage();
   }
 }

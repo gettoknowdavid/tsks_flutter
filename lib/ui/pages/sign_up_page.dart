@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:responsive_framework/responsive_framework.dart';
-import 'package:tsks_flutter/ui/widgets/auth_redirect_button.dart';
 import 'package:tsks_flutter/ui/widgets/facebook_sign_in_button.dart';
 import 'package:tsks_flutter/ui/widgets/google_sign_in_button.dart';
-import 'package:tsks_flutter/ui/widgets/sign_in_form_widget.dart';
+import 'package:tsks_flutter/ui/widgets/sign_up_form_widget.dart';
 
-class SignInPage extends StatelessWidget {
-  const SignInPage({super.key});
+class SignUpPage extends StatelessWidget {
+  const SignUpPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +41,7 @@ class SignInPage extends StatelessWidget {
                 ],
               ).value,
               Text(
-                'Sign In.',
+                'Sign Up.',
                 style: textTheme.displaySmall,
                 textAlign: TextAlign.center,
               ),
@@ -50,22 +50,22 @@ class SignInPage extends StatelessWidget {
               const SizedBox(height: 20),
               const FacebookSignInButton(),
               const SizedBox(height: 20),
-              const Text('or', textAlign: TextAlign.center),
+              Text(
+                'or',
+                style: textTheme.labelMedium,
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 20),
-              const SignInFormWidget(),
+              const SignUpFormWidget(),
               const SizedBox(height: 50),
-              const AuthRedirectButton(),
-              const SizedBox(height: 10),
               Center(
-                child: TextButton(
-                  onPressed: () {},
+                child: TextButton.icon(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(PhosphorIconsRegular.caretLeft),
                   style: TextButton.styleFrom(
                     foregroundColor: colors.onSurfaceVariant,
                   ),
-                  child: const Text(
-                    'Forgot Password?',
-                    textAlign: TextAlign.center,
-                  ),
+                  label: const Text('Back to Sign in'),
                 ),
               ),
             ],

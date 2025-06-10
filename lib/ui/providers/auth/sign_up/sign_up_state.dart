@@ -12,14 +12,14 @@ final class SignUpState with EquatableMixin {
     required this.fullName,
     required this.email,
     required this.password,
-    this.status = SignInStatus.initial,
+    this.status = SignUpStatus.initial,
     this.exception,
   });
 
   final SingleLineString fullName;
   final Email email;
   final Password password;
-  final SignInStatus status;
+  final SignUpStatus status;
   final TsksException? exception;
 
   @override
@@ -54,7 +54,7 @@ final class SignUpState with EquatableMixin {
       fullName: fullName,
       email: email,
       password: password,
-      status: SignInStatus.loading,
+      status: SignUpStatus.loading,
     );
   }
 
@@ -63,7 +63,7 @@ final class SignUpState with EquatableMixin {
       fullName: fullName,
       email: email,
       password: password,
-      status: SignInStatus.success,
+      status: SignUpStatus.success,
     );
   }
 
@@ -72,7 +72,7 @@ final class SignUpState with EquatableMixin {
       fullName: fullName,
       email: email,
       password: password,
-      status: SignInStatus.failure,
+      status: SignUpStatus.failure,
       exception: exception,
     );
   }
@@ -80,4 +80,11 @@ final class SignUpState with EquatableMixin {
   bool get isFormValid => email.isValid && password.isValid;
 }
 
-enum SignInStatus { initial, loading, success, failure }
+enum SignUpStatus { initial, loading, success, failure }
+
+extension SignUpStatusX on SignUpStatus {
+  bool get isInitial => this == SignUpStatus.initial;
+  bool get isLoading => this == SignUpStatus.loading;
+  bool get isSuccess => this == SignUpStatus.success;
+  bool get isFailure => this == SignUpStatus.failure;
+}

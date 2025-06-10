@@ -4,8 +4,10 @@ import 'package:tsks_flutter/ui/core/themes/typography.dart';
 
 abstract final class TsksTheme {
   static ThemeData lightTheme = _rawTheme(TsksColors.lightColorScheme);
+  // static ThemeData lightTheme = _rawTheme(const ColorScheme.light());
 
   static ThemeData darkTheme = _rawTheme(TsksColors.darkColorScheme);
+  // static ThemeData darkTheme = _rawTheme(const ColorScheme.dark());
 
   static ThemeData _rawTheme(ColorScheme colorScheme) {
     final baseTheme = ThemeData(

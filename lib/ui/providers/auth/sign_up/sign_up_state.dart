@@ -5,7 +5,7 @@ final class SignUpState with EquatableMixin {
     : this._(
         fullName: SingleLineString(''),
         email: Email(''),
-        password: Password(''),
+        password: Password('', PasswordMode.signUp),
       );
 
   const SignUpState._({
@@ -45,7 +45,7 @@ final class SignUpState with EquatableMixin {
     return SignUpState._(
       fullName: fullName,
       email: email,
-      password: Password(password),
+      password: Password(password, PasswordMode.signUp),
     );
   }
 

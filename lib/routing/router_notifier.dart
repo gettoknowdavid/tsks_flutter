@@ -7,18 +7,20 @@ import 'package:tsks_flutter/domain/models/auth/user.dart';
 import 'package:tsks_flutter/ui/auth/pages/pages.dart';
 import 'package:tsks_flutter/ui/auth/providers/auth_repository_provider.dart';
 import 'package:tsks_flutter/ui/core/ui/landing_page.dart';
-import 'package:tsks_flutter/ui/todos/pages/dashboard_page.dart';
+import 'package:tsks_flutter/ui/core/ui/tsks_layout.dart';
+import 'package:tsks_flutter/ui/todos/pages/pages.dart';
 
 part 'router_notifier.g.dart';
 part 'router_state.dart';
 
-final navigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> layoutKey = GlobalKey<NavigatorState>();
 
 @Riverpod(keepAlive: true)
 GoRouter routerConfig(Ref ref) {
   final tsksRouterNotifier = ref.watch(tsksRouterProvider);
   return GoRouter(
-    navigatorKey: navigatorKey,
+    navigatorKey: rootNavigatorKey,
     initialLocation: const DashboardRoute().location,
     routes: $appRoutes,
     refreshListenable: tsksRouterNotifier,
@@ -65,16 +67,6 @@ final class LandingRoute extends GoRouteData with _$LandingRoute {
   }
 }
 
-@TypedGoRoute<DashboardRoute>(path: '/', name: 'Dashboard')
-final class DashboardRoute extends GoRouteData with _$DashboardRoute {
-  const DashboardRoute();
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return const DashboardPage();
-  }
-}
-
 @TypedGoRoute<SignInRoute>(path: '/sign-in', name: 'Sign In')
 final class SignInRoute extends GoRouteData with _$SignInRoute {
   const SignInRoute();
@@ -92,5 +84,117 @@ final class SignUpRoute extends GoRouteData with _$SignUpRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const SignUpPage();
+  }
+}
+
+@TypedStatefulShellRoute<TsksLayoutRoute>(
+  branches: <TypedStatefulShellBranch<StatefulShellBranchData>>[
+    TypedStatefulShellBranch<DashboardShellBranchData>(
+      routes: <TypedRoute<RouteData>>[
+        TypedGoRoute<DashboardRoute>(
+          path: '/',
+          name: 'Dashboard',
+        ),
+      ],
+    ),
+    TypedStatefulShellBranch<CollectionsShellBranchData>(
+      routes: <TypedRoute<RouteData>>[
+        TypedGoRoute<CollectionsRoute>(
+          path: '/collections',
+          name: 'Collections',
+        ),
+      ],
+    ),
+    TypedStatefulShellBranch<SearchShellBranchData>(
+      routes: <TypedRoute<RouteData>>[
+        TypedGoRoute<SearchRoute>(
+          path: '/search',
+          name: 'Search',
+        ),
+      ],
+    ),
+    TypedStatefulShellBranch<NotificationsShellBranchData>(
+      routes: <TypedRoute<RouteData>>[
+        TypedGoRoute<NotificationsRoute>(
+          path: '/notifications',
+          name: 'Notifications',
+        ),
+      ],
+    ),
+  ],
+)
+final class TsksLayoutRoute extends StatefulShellRouteData {
+  const TsksLayoutRoute();
+  static final GlobalKey<NavigatorState> $navigatorKey = layoutKey;
+
+  @override
+  Widget builder(
+    BuildContext context,
+    GoRouterState state,
+    StatefulNavigationShell navigationShell,
+  ) {
+    return TsksLayout(navigationShell: navigationShell);
+  }
+}
+
+final class DashboardShellBranchData extends StatefulShellBranchData {
+  const DashboardShellBranchData();
+}
+
+final class DashboardRoute extends GoRouteData with _$DashboardRoute {
+  const DashboardRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const DashboardPage();
+  }
+}
+
+final class CollectionsShellBranchData extends StatefulShellBranchData {
+  const CollectionsShellBranchData();
+}
+
+final class CollectionsRoute extends GoRouteData with _$CollectionsRoute {
+  const CollectionsRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const CollectionsPage();
+  }
+}
+
+final class SearchShellBranchData extends StatefulShellBranchData {
+  const SearchShellBranchData();
+}
+
+final class SearchRoute extends GoRouteData with _$SearchRoute {
+  const SearchRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const SearchPage();
+  }
+}
+
+final class NotificationsShellBranchData extends StatefulShellBranchData {
+  const NotificationsShellBranchData();
+}
+
+final class NotificationsRoute extends GoRouteData with _$NotificationsRoute {
+  const NotificationsRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const NotificationsPage();
+  }
+}
+
+extension GoRouterX on GoRouter {
+  String get currentLocation {
+    final lastMatch = routerDelegate.currentConfiguration.last;
+    final matchList = lastMatch is ImperativeRouteMatch
+        ? lastMatch.matches
+        : routerDelegate.currentConfiguration;
+    return matchList.uri.toString();
   }
 }

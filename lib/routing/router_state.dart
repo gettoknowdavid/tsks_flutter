@@ -16,7 +16,7 @@ final class TsksRouterState with EquatableMixin {
 
   TsksRouterState authenticated() => const TsksRouterState._(
     redirectPath: '/',
-    allowedPath: ['/'],
+    allowedPath: ['/', '/collections', '/search', '/notifications'],
   );
 
   TsksRouterState unauthenticated() => const TsksRouterState._(

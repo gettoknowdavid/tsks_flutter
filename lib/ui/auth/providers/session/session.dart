@@ -1,6 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:tsks_flutter/domain/models/auth/user.dart';
-import 'package:tsks_flutter/ui/providers/providers.dart';
+import 'package:tsks_flutter/ui/auth/providers/auth_repository_provider.dart';
 
 part 'session.g.dart';
 

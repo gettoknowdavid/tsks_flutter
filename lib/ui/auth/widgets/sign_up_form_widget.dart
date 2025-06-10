@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:tsks_flutter/ui/auth/providers/sign_up/sign_up_notifier.dart';
 import 'package:tsks_flutter/ui/core/ui/ui.dart';
-import 'package:tsks_flutter/ui/providers/auth/sign_up/sign_up_notifier.dart';
 
 class SignUpFormWidget extends HookConsumerWidget {
   const SignUpFormWidget({super.key});
@@ -127,20 +127,6 @@ class _SignUpButton extends ConsumerWidget {
     return FilledButton(
       onPressed: isLoading ? null : signUp,
       child: isLoading ? const TinyLoadingIndicator() : const Text('Sign up'),
-    );
-  }
-}
-
-class TinyLoadingIndicator extends StatelessWidget {
-  const TinyLoadingIndicator({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: SizedBox.square(
-        dimension: 20,
-        child: CircularProgressIndicator(),
-      ),
     );
   }
 }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tsks_flutter/domain/models/auth/user.dart';
-import 'package:tsks_flutter/ui/pages/loading_page.dart';
-import 'package:tsks_flutter/ui/providers/providers.dart';
+import 'package:tsks_flutter/ui/auth/providers/auth_repository_provider.dart';
+import 'package:tsks_flutter/ui/auth/providers/session/session.dart';
+import 'package:tsks_flutter/ui/core/ui/loading_page.dart';
 
 class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});

@@ -3,9 +3,10 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:tsks_flutter/routing/router_notifier.dart';
+import 'package:tsks_flutter/ui/auth/providers/auth_repository_provider.dart';
+import 'package:tsks_flutter/ui/auth/providers/session/session.dart';
 import 'package:tsks_flutter/ui/core/themes/themes.dart';
 import 'package:tsks_flutter/ui/core/ui/ui.dart' show TsksCustomScrollBehavior;
-import 'package:tsks_flutter/ui/providers/providers.dart';
 
 class TsksApp extends ConsumerWidget {
   const TsksApp({super.key});

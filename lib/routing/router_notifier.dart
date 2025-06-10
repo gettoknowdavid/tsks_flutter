@@ -4,8 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:tsks_flutter/domain/models/auth/user.dart';
-import 'package:tsks_flutter/ui/pages/pages.dart';
-import 'package:tsks_flutter/ui/providers/auth/auth.dart';
+import 'package:tsks_flutter/ui/auth/pages/pages.dart';
+import 'package:tsks_flutter/ui/auth/providers/auth_repository_provider.dart';
+import 'package:tsks_flutter/ui/core/ui/landing_page.dart';
+import 'package:tsks_flutter/ui/todos/pages/dashboard_page.dart';
 
 part 'router_notifier.g.dart';
 part 'router_state.dart';
@@ -52,16 +54,6 @@ class TsksRouter extends _$TsksRouter {
     return state;
   }
 }
-
-// @TypedGoRoute<LoadingRoute>(path: '/loading', name: 'Loading')
-// final class LoadingRoute extends GoRouteData with _$LoadingRoute {
-//   const LoadingRoute();
-
-//   @override
-//   Widget build(BuildContext context, GoRouterState state) {
-//     return const LoadingPage();
-//   }
-// }
 
 @TypedGoRoute<LandingRoute>(path: '/landing', name: 'Landing')
 final class LandingRoute extends GoRouteData with _$LandingRoute {

@@ -55,3 +55,10 @@ final class SignInState with EquatableMixin {
 }
 
 enum SignInStatus { initial, loading, success, failure }
+
+extension SignUpStatusX on SignInStatus {
+  bool get isInitial => this == SignInStatus.initial;
+  bool get isLoading => this == SignInStatus.loading;
+  bool get isSuccess => this == SignInStatus.success;
+  bool get isFailure => this == SignInStatus.failure;
+}

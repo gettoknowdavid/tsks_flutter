@@ -17,7 +17,7 @@ GoRouter routerConfig(Ref ref) {
   final tsksRouterNotifier = ref.watch(tsksRouterProvider);
   return GoRouter(
     navigatorKey: navigatorKey,
-    initialLocation: const SignInRoute().location,
+    initialLocation: const DashboardRoute().location,
     routes: $appRoutes,
     refreshListenable: tsksRouterNotifier,
     redirect: (context, routerState) {

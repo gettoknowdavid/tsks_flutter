@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:tsks_flutter/routing/router_notifier.dart';
 import 'package:tsks_flutter/ui/core/ui/ui.dart';
 import 'package:tsks_flutter/ui/providers/auth/sign_up/sign_up_notifier.dart';
 
@@ -19,7 +18,6 @@ class SignUpFormWidget extends HookConsumerWidget {
         case SignUpStatus.failure:
           context.showErrorSnackBar(next.exception?.message);
         case SignUpStatus.success:
-          const DashboardRoute().go(context);
         case SignUpStatus.initial:
         case SignUpStatus.loading:
       }

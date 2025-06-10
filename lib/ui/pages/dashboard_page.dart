@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tsks_flutter/domain/models/auth/user.dart';
 import 'package:tsks_flutter/ui/pages/loading_page.dart';
-import 'package:tsks_flutter/ui/providers/auth/auth.dart';
+import 'package:tsks_flutter/ui/providers/providers.dart';
 
 class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});
@@ -24,6 +24,16 @@ class DashboardView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return const Scaffold(body: Column(children: [Text('Dashboard Page')]));
+    return Scaffold(
+      body: Column(
+        children: [
+          const Text('Dashboard Page'),
+          ElevatedButton(
+            onPressed: () => ref.read(sessionProvider.notifier).signOut(),
+            child: const Text('Sign out'),
+          ),
+        ],
+      ),
+    );
   }
 }

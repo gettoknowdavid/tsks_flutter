@@ -11,6 +11,15 @@ abstract final class TsksTypography {
       displaySmall: baseTextTheme.displaySmall?.copyWith(
         fontWeight: FontWeight.w700,
       ),
+      headlineMedium: baseTextTheme.headlineMedium?.copyWith(
+        fontWeight: FontWeight.w600,
+      ),
+      titleLarge: baseTextTheme.titleLarge?.copyWith(
+        fontWeight: FontWeight.w600,
+      ),
+      titleMedium: baseTextTheme.titleMedium?.copyWith(
+        fontWeight: FontWeight.w700,
+      ),
       // ...
     );
   }

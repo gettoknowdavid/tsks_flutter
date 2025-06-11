@@ -1,5 +1,7 @@
 export 'landing_page.dart';
 export 'loading_page.dart';
+export 'page_header_widget.dart';
+export 'page_widget.dart';
 export 'scroll_behaviour.dart';
 export 'tiny_loading_indicator.dart';
 export 'tsks_a_app_bar_actions.dart';

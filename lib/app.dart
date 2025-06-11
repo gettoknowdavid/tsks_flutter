@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:tsks_flutter/routing/router_notifier.dart';
@@ -15,19 +14,22 @@ class TsksApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(userChangesProvider);
     ref.watch(sessionProvider);
-    final routerConfig = ref.watch(routerConfigProvider);
-    return TsksAppView(routerConfig: routerConfig);
+    ref.watch(tsksRouterProvider);
+    ref.watch(routerConfigProvider);
+    return const TsksAppView();
   }
 }
 
-class TsksAppView extends StatelessWidget {
-  const TsksAppView({required this.routerConfig, super.key});
-  final GoRouter routerConfig;
+class TsksAppView extends ConsumerWidget {
+  const TsksAppView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final routerConfig = ref.watch(routerConfigProvider);
     return MaterialApp.router(
-      routerConfig: routerConfig,
+      routeInformationParser: routerConfig.routeInformationParser,
+      routerDelegate: routerConfig.routerDelegate,
+      routeInformationProvider: routerConfig.routeInformationProvider,
       theme: TsksTheme.lightTheme,
       darkTheme: TsksTheme.darkTheme,
       debugShowCheckedModeBanner: false,

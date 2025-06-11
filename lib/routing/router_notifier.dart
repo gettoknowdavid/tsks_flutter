@@ -33,6 +33,18 @@ GoRouter routerConfig(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
+Stream<String> routerLocation(Ref ref) {
+  final delegate = ref.watch(routerConfigProvider).routerDelegate;
+
+  return Stream.multi((contr) {
+    contr.add(delegate.currentConfiguration.uri.toString());
+    void listener() => contr.add(delegate.currentConfiguration.uri.toString());
+    delegate.addListener(listener);
+    ref.onDispose(() => delegate.removeListener(listener));
+  });
+}
+
+@Riverpod(keepAlive: true)
 class TsksRouter extends _$TsksRouter {
   @override
   Raw<ValueNotifier<TsksRouterState>> build() {
@@ -87,16 +99,6 @@ final class SignUpRoute extends GoRouteData with _$SignUpRoute {
   }
 }
 
-@TypedGoRoute<ProfileRoute>(path: '/me', name: 'My Profile')
-final class ProfileRoute extends GoRouteData with _$ProfileRoute {
-  const ProfileRoute();
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return const ProfilePage();
-  }
-}
-
 @TypedStatefulShellRoute<TsksLayoutRoute>(
   branches: <TypedStatefulShellBranch<StatefulShellBranchData>>[
     TypedStatefulShellBranch<DashboardShellBranchData>(
@@ -128,6 +130,14 @@ final class ProfileRoute extends GoRouteData with _$ProfileRoute {
         TypedGoRoute<NotificationsRoute>(
           path: '/notifications',
           name: 'Notifications',
+        ),
+      ],
+    ),
+    TypedStatefulShellBranch<ProfileShellBranchData>(
+      routes: <TypedRoute<RouteData>>[
+        TypedGoRoute<ProfileRoute>(
+          path: '/me',
+          name: 'My Profile',
         ),
       ],
     ),
@@ -199,12 +209,25 @@ final class NotificationsRoute extends GoRouteData with _$NotificationsRoute {
   }
 }
 
-extension GoRouterX on GoRouter {
-  String get currentLocation {
-    final lastMatch = routerDelegate.currentConfiguration.last;
-    final matchList = lastMatch is ImperativeRouteMatch
-        ? lastMatch.matches
-        : routerDelegate.currentConfiguration;
-    return matchList.uri.toString();
+final class ProfileShellBranchData extends StatefulShellBranchData {
+  const ProfileShellBranchData();
+}
+
+final class ProfileRoute extends GoRouteData with _$ProfileRoute {
+  const ProfileRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const ProfilePage();
   }
 }
+
+// extension GoRouterX on GoRouter {
+//   String get currentLocation {
+//     final lastMatch = routerDelegate.currentConfiguration.last;
+//     final matchList = lastMatch is ImperativeRouteMatch
+//         ? lastMatch.matches
+//         : routerDelegate.currentConfiguration;
+//     return matchList.uri.toString();
+//   }
+// }

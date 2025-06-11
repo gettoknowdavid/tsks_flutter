@@ -17,7 +17,8 @@ class UserAvatar extends ConsumerWidget {
     final session = ref.watch(sessionProvider);
     final avatar = CircleAvatar(radius: radius);
 
-    void onTap() => const ProfileRoute().push<void>(context);
+    final router = ref.read(routerConfigProvider);
+    void onTap() => router.push<void>(const ProfileRoute().location);
 
     switch (session) {
       case AsyncLoading():

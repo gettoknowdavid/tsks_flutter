@@ -1,46 +1,60 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:tsks_flutter/routing/router_notifier.dart';
+import 'package:tsks_flutter/ui/todos/pages/pages.dart';
 
 class Destination {
-  const Destination(this.icon, this.label, this.path);
+  const Destination({
+    required this.icon,
+    required this.label,
+    required this.path,
+    required this.widget,
+  });
+
   final IconData icon;
   final String label;
   final String path;
+  final Widget widget;
 }
 
 List<Destination> destinations = <Destination>[
   Destination(
-    PhosphorIconsBold.squaresFour,
-    'Dashboard',
-    const DashboardRoute().location,
+    icon: PhosphorIconsBold.squaresFour,
+    label: 'Dashboard',
+    path: const DashboardRoute().location,
+    widget: const DashboardPage(),
   ),
   Destination(
-    PhosphorIconsBold.cards,
-    'Collections',
-    const CollectionsRoute().location,
+    icon: PhosphorIconsBold.cards,
+    label: 'Collections',
+    path: const CollectionsRoute().location,
+    widget: const CollectionsPage(),
   ),
   Destination(
-    PhosphorIconsBold.magnifyingGlass,
-    'Search',
-    const SearchRoute().location,
+    icon: PhosphorIconsBold.magnifyingGlass,
+    label: 'Search',
+    path: const SearchRoute().location,
+    widget: const SearchPage(),
   ),
   Destination(
-    PhosphorIconsBold.bell,
-    'Notification',
-    const NotificationsRoute().location,
+    icon: PhosphorIconsBold.bell,
+    label: 'Notification',
+    path: const NotificationsRoute().location,
+    widget: const NotificationsPage(),
   ),
 ];
 
 List<Destination> appBarDestinations = <Destination>[
   Destination(
-    PhosphorIconsBold.squaresFour,
-    'Dashboard',
-    const DashboardRoute().location,
+    icon: PhosphorIconsBold.squaresFour,
+    label: 'Dashboard',
+    path: const DashboardRoute().location,
+    widget: const DashboardPage(),
   ),
   Destination(
-    PhosphorIconsBold.cards,
-    'Collections',
-    const CollectionsRoute().location,
+    icon: PhosphorIconsBold.cards,
+    label: 'Collections',
+    path: const CollectionsRoute().location,
+    widget: const CollectionsPage(),
   ),
 ];

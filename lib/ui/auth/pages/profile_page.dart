@@ -1,11 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:tsks_flutter/domain/models/auth/user.dart';
+import 'package:tsks_flutter/ui/auth/providers/auth_repository_provider.dart';
+import 'package:tsks_flutter/ui/auth/providers/session/session.dart';
+import 'package:tsks_flutter/ui/core/ui/loading_page.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Container();
+    final authState = ref.watch(userChangesProvider);
+    return switch (authState) {
+      AsyncError(:final error) => Text(error.toString()),
+      AsyncData(:final value) =>
+        value == User.empty ? const LoadingPage() : const ProfileView(),
+      _ => const LoadingPage(),
+    };
+  }
+}
+
+class ProfileView extends ConsumerWidget {
+  const ProfileView({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Scaffold(
+      body: Column(
+        children: [
+          const Text('Profile Page'),
+          ElevatedButton(
+            onPressed: () => ref.read(sessionProvider.notifier).signOut(),
+            child: const Text('Sign out'),
+          ),
+        ],
+      ),
+    );
   }
 }

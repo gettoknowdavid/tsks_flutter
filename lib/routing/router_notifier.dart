@@ -87,6 +87,16 @@ final class SignUpRoute extends GoRouteData with _$SignUpRoute {
   }
 }
 
+@TypedGoRoute<ProfileRoute>(path: '/me', name: 'My Profile')
+final class ProfileRoute extends GoRouteData with _$ProfileRoute {
+  const ProfileRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const ProfilePage();
+  }
+}
+
 @TypedStatefulShellRoute<TsksLayoutRoute>(
   branches: <TypedStatefulShellBranch<StatefulShellBranchData>>[
     TypedStatefulShellBranch<DashboardShellBranchData>(

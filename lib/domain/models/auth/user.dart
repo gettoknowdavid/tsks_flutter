@@ -25,3 +25,30 @@ final class User with EquatableMixin {
   @override
   List<Object?> get props => [id, fullName, email, photoURL, emailVerified];
 }
+
+extension FullNameX on User {
+  /// Used to get the initials of the user's full name
+  String get nameInitials {
+    final fullNameStr = fullName.getOrCrash;
+
+    // 1. Trim leading/trailing whitespace
+    // 2. Split by one or more whitespace characters (RegExp(r'\s+'))
+    //    This correctly handles "John  Doe" or "Jane   Maria"
+    // 3. Filter out any empty strings that might result from multiple spaces
+    final effectiveNames = fullNameStr
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((name) => name.isNotEmpty)
+        .toList();
+
+    if (effectiveNames.isEmpty) {
+      return '';
+    } else if (effectiveNames.length == 1) {
+      return effectiveNames[0].toUpperCase();
+    } else {
+      final firstInitial = effectiveNames.first[0].toUpperCase();
+      final lastInitial = effectiveNames.last[0].toUpperCase();
+      return '$firstInitial$lastInitial';
+    }
+  }
+}

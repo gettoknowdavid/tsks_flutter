@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:tsks_flutter/ui/core/ui/page_header_widget.dart';
 
-
 class PageWidget extends StatelessWidget {
   const PageWidget({
     required this.title,
     super.key,
+    this.showBackButton = false,
     this.onMoreTap,
     this.content = const SizedBox.shrink(),
   });
 
   final String title;
+  final bool showBackButton;
   final VoidCallback? onMoreTap;
   final Widget content;
 
@@ -35,7 +36,11 @@ class PageWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 40),
-              PageHeaderWidget(title: title, onMoreTap: onMoreTap),
+              PageHeaderWidget(
+                title: title,
+                showBackButton: showBackButton,
+                onMoreTap: onMoreTap,
+              ),
               content,
             ],
           ),

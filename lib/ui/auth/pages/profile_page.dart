@@ -32,6 +32,7 @@ class ProfileView extends StatelessWidget {
   Widget build(BuildContext context) {
     return PageWidget(
       title: 'My Account',
+      showBackButton: true,
       content: Skeletonizer(
         enabled: isLoading,
         child: const Column(

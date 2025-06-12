@@ -31,13 +31,15 @@ final class CollectionsRepository {
   }
 
   Future<Either<TsksException, Unit>> createCollection({
+    required Id id,
     required SingleLineString title,
     bool? isFavourite = false,
     int? colorARGB,
     Map<String, dynamic>? iconMap,
   }) async {
     try {
-      await _collectionRef.doc().set({
+      await _collectionRef.doc(id.getOrCrash).set({
+        'id': id.getOrCrash,
         'title': title.getOrCrash,
         'isFavourite': isFavourite,
         'colorARGB': colorARGB,

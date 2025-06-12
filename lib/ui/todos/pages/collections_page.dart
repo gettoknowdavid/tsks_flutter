@@ -27,7 +27,16 @@ class CollectionsGridWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final collections = ref.watch(collectionsProvider);
     return switch (collections) {
-      AsyncError(:final error) => Text(error.toString()),
+      AsyncError(:final error) => Center(
+        child: Column(
+          children: [
+            const SizedBox(height: 60),
+            Text(error.toString()),
+            const SizedBox(height: 20),
+            const AddNewCollectionButton(),
+          ],
+        ),
+      ),
       AsyncData(:final value) => CollectionsGrid(value),
       _ => CollectionsGrid(fakeCollections, isLoading: true),
     };

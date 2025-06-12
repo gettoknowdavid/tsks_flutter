@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fpdart/fpdart.dart';
@@ -56,6 +57,7 @@ final class CollectionsRepository {
   Future<Either<TsksException, List<Collection>>> getCollections() async {
     try {
       final querySnapshot = await _collectionRef.collectionConverter.get();
+      log(querySnapshot.docs.map((s) => s.data()).toString());
       final collections = querySnapshot.docs
           .map((snapshot) => snapshot.data().toDomain())
           .toList();

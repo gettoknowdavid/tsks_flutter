@@ -1,4 +1,4 @@
-part of 'collection_form_notifier.dart';
+part of 'collection_form.dart';
 
 final class CollectionFormState with EquatableMixin {
   CollectionFormState()
@@ -40,13 +40,13 @@ final class CollectionFormState with EquatableMixin {
     );
   }
 
-  CollectionFormState withIsFavourite(bool isFavouriteValue) {
+  CollectionFormState withIsFavourite(bool? isFavouriteValue) {
     return CollectionFormState._(
       id: id,
       title: title,
       colorARGB: colorARGB,
       iconMap: iconMap,
-      isFavourite: isFavouriteValue,
+      isFavourite: isFavouriteValue ?? isFavourite,
       createdAt: createdAt,
     );
   }

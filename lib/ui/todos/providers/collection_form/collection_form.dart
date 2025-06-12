@@ -5,17 +5,17 @@ import 'package:tsks_flutter/domain/core/exceptions/tsks_exception.dart';
 import 'package:tsks_flutter/domain/core/value_objects/value_objects.dart';
 import 'package:uuid/uuid.dart';
 
+part 'collection_form.g.dart';
 part 'collection_form_state.dart';
-part 'collection_form_notifier.g.dart';
 
 @riverpod
-class CollectionFormNotifier extends _$CollectionFormNotifier {
+class CollectionForm extends _$CollectionForm {
   @override
   CollectionFormState build() => CollectionFormState();
 
   void titleChanged(String title) => state = state.withTitle(title);
 
-  void isFavouriteChanged(bool value) => state = state.withIsFavourite(value);
+  void isFavouriteChanged(bool? value) => state = state.withIsFavourite(value);
 
   void colorChanged(int value) => state = state.withColor(value);
 

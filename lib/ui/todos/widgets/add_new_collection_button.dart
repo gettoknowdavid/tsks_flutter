@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tsks_flutter/ui/todos/widgets/collection_editor_dialog.dart';
 
 class AddNewCollectionButton extends StatelessWidget {
   const AddNewCollectionButton({super.key});
@@ -8,8 +9,12 @@ class AddNewCollectionButton extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     return IconButton(
       icon: const Icon(Icons.add),
-      // onPressed: () => context.push(R.collectionEditor),
-      onPressed: () {},
+      onPressed: () {
+        showDialog<void>(
+          context: context,
+          builder: (context) => const CollectionEditorDialog(),
+        );
+      },
       iconSize: 32,
       style: IconButton.styleFrom(
         side: BorderSide(width: 2, color: colors.surfaceContainer),

@@ -15,7 +15,7 @@ abstract final class TsksTheme {
       colorScheme: colorScheme,
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 25),
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 32),
           side: BorderSide(width: 3, color: colorScheme.outlineVariant),
           shape: const RoundedSuperellipseBorder(
             borderRadius: BorderRadiusGeometry.all(Radius.circular(12)),
@@ -24,7 +24,7 @@ abstract final class TsksTheme {
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 25),
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 32),
           shape: const RoundedSuperellipseBorder(
             borderRadius: BorderRadiusGeometry.all(Radius.circular(12)),
           ),
@@ -32,7 +32,7 @@ abstract final class TsksTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 25),
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 32),
           shape: const RoundedSuperellipseBorder(
             borderRadius: BorderRadiusGeometry.all(Radius.circular(12)),
           ),

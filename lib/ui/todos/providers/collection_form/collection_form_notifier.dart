@@ -1,0 +1,40 @@
+import 'package:equatable/equatable.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:tsks_flutter/data/repositories/todos/collections_repository.dart';
+import 'package:tsks_flutter/domain/core/exceptions/tsks_exception.dart';
+import 'package:tsks_flutter/domain/core/value_objects/value_objects.dart';
+import 'package:uuid/uuid.dart';
+
+part 'collection_form_state.dart';
+part 'collection_form_notifier.g.dart';
+
+@riverpod
+class CollectionFormNotifier extends _$CollectionFormNotifier {
+  @override
+  CollectionFormState build() => CollectionFormState();
+
+  void titleChanged(String title) => state = state.withTitle(title);
+
+  void isFavouriteChanged(bool value) => state = state.withIsFavourite(value);
+
+  void colorChanged(int value) => state = state.withColor(value);
+
+  void iconChanged(Map<String, String> value) => state = state.withIcon(value);
+
+  Future<void> submit() async {
+    if (!state.isFormValid) return;
+    state = state.withSubmissionInProgress();
+    final repository = ref.read(collectionsRepositoryProvider);
+    final response = await repository.createCollection(
+      id: state.id,
+      title: state.title,
+      colorARGB: state.colorARGB,
+      iconMap: state.iconMap,
+      isFavourite: state.isFavourite,
+    );
+    state = response.fold(
+      state.withSubmissionFailure,
+      state.withSubmissionSuccess,
+    );
+  }
+}

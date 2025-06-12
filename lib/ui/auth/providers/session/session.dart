@@ -1,4 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:tsks_flutter/data/services/cloud_firestore.dart';
+import 'package:tsks_flutter/domain/core/exceptions/tsks_exception.dart';
 import 'package:tsks_flutter/domain/models/auth/user.dart';
 import 'package:tsks_flutter/ui/auth/providers/auth_repository_provider.dart';
 
@@ -19,4 +23,12 @@ class Session extends _$Session {
   }
 
   Future<void> signOut() => ref.read(authRepositoryProvider).signOut();
+}
+
+@riverpod
+DocumentReference<User> userDocumentReference(Ref ref) {
+  final user = ref.watch(sessionProvider).valueOrNull;
+  if (user == User.empty) throw const NoUserException();
+  final firestore = ref.read(firestoreProvider);
+  return firestore.collection('users').userConverter.doc(user?.id.getOrCrash);
 }

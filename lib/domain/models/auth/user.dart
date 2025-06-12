@@ -3,7 +3,7 @@ import 'package:tsks_flutter/domain/core/value_objects/value_objects.dart';
 
 final class User with EquatableMixin {
   const User({
-    required this.id,
+    required this.uid,
     required this.fullName,
     required this.email,
     this.photoURL,
@@ -11,19 +11,19 @@ final class User with EquatableMixin {
   });
 
   static User empty = User(
-    id: Id.fromString(''),
+    uid: Uid(''),
     fullName: SingleLineString(''),
     email: Email(''),
   );
 
-  final Id id;
+  final Uid uid;
   final SingleLineString fullName;
   final Email email;
   final String? photoURL;
   final bool emailVerified;
 
   @override
-  List<Object?> get props => [id, fullName, email, photoURL, emailVerified];
+  List<Object?> get props => [uid, fullName, email, photoURL, emailVerified];
 }
 
 extension FullNameX on User {

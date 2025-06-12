@@ -9,7 +9,7 @@ part 'user_dto.g.dart';
 @JsonSerializable()
 final class UserDto with EquatableMixin {
   const UserDto({
-    required this.id,
+    required this.uid,
     required this.fullName,
     required this.email,
     this.photoURL,
@@ -21,7 +21,7 @@ final class UserDto with EquatableMixin {
 
   factory UserDto.fromFirebaseUser(firebase_auth.User user) {
     return UserDto(
-      id: user.uid,
+      uid: user.uid,
       fullName: user.displayName!,
       email: user.email!,
       photoURL: user.photoURL,
@@ -31,7 +31,7 @@ final class UserDto with EquatableMixin {
 
   factory UserDto.fromDomain(User user) {
     return UserDto(
-      id: user.id.getOrCrash,
+      uid: user.uid.getOrCrash,
       fullName: user.fullName.getOrCrash,
       email: user.email.getOrCrash,
       photoURL: user.photoURL,
@@ -39,20 +39,20 @@ final class UserDto with EquatableMixin {
     );
   }
 
-  static UserDto empty = const UserDto(id: '', fullName: '', email: '');
+  static UserDto empty = const UserDto(uid: '', fullName: '', email: '');
 
-  final String id;
+  final String uid;
   final String fullName;
   final String email;
   final String? photoURL;
   final bool emailVerified;
 
   @override
-  List<Object?> get props => [id, fullName, email, photoURL, emailVerified];
+  List<Object?> get props => [uid, fullName, email, photoURL, emailVerified];
 
   User toDomain() {
     return User(
-      id: Id.fromString(id),
+      uid: Uid(uid),
       fullName: SingleLineString(fullName),
       email: Email(email),
       photoURL: photoURL,

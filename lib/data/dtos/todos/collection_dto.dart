@@ -8,7 +8,7 @@ part 'collection_dto.g.dart';
 @JsonSerializable()
 final class CollectionDto with EquatableMixin {
   const CollectionDto({
-    required this.id,
+    required this.uid,
     required this.title,
     this.isFavourite = false,
     this.colorARGB,
@@ -21,7 +21,7 @@ final class CollectionDto with EquatableMixin {
 
   factory CollectionDto.fromDomain(Collection collection) {
     return CollectionDto(
-      id: collection.id.getOrCrash,
+      uid: collection.uid.getOrCrash,
       title: collection.title.getOrCrash,
       isFavourite: collection.isFavourite,
       colorARGB: collection.colorARGB,
@@ -30,7 +30,7 @@ final class CollectionDto with EquatableMixin {
     );
   }
 
-  final String id;
+  final String uid;
   final String title;
   final bool isFavourite;
   final int? colorARGB;
@@ -39,7 +39,7 @@ final class CollectionDto with EquatableMixin {
 
   @override
   List<Object?> get props => [
-    id,
+    uid,
     title,
     isFavourite,
     colorARGB,
@@ -50,7 +50,7 @@ final class CollectionDto with EquatableMixin {
 
   Collection toDomain() {
     return Collection(
-      id: Id.fromString(id),
+      uid: Uid(uid),
       title: SingleLineString(title),
       isFavourite: isFavourite,
       colorARGB: colorARGB,

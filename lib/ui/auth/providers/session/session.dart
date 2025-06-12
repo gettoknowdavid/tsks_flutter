@@ -28,7 +28,13 @@ class Session extends _$Session {
 @riverpod
 DocumentReference<User> userDocumentReference(Ref ref) {
   final user = ref.watch(sessionProvider).valueOrNull;
-  if (user == User.empty) throw const NoUserException();
-  final firestore = ref.read(firestoreProvider);
-  return firestore.collection('users').userConverter.doc(user?.id.getOrCrash);
+  if (user == User.empty) {
+    throw const NoUserException();
+  } else {
+    final firestore = ref.read(firestoreProvider);
+    return firestore
+        .collection('users')
+        .userConverter
+        .doc(user?.uid.getOrCrash);
+  }
 }

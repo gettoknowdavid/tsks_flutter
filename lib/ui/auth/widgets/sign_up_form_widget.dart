@@ -55,6 +55,11 @@ class _FullNameField extends HookConsumerWidget {
       onChanged: ref.read(signUpNotifierProvider.notifier).fullNameChanged,
       validator: (value) => fullName.failureOrNull?.message,
       enabled: status != SignUpStatus.loading,
+      onFieldSubmitted: (value) async {
+        if (Form.of(context).validate()) {
+          await ref.read(signUpNotifierProvider.notifier).signUp();
+        }
+      },
     );
   }
 }
@@ -69,7 +74,13 @@ class _EmailField extends HookConsumerWidget {
       decoration: const InputDecoration(hintText: 'Email'),
       onChanged: ref.read(signUpNotifierProvider.notifier).emailChanged,
       validator: (value) => email.failureOrNull?.message,
+      keyboardType: TextInputType.emailAddress,
       enabled: status != SignUpStatus.loading,
+      onFieldSubmitted: (value) async {
+        if (Form.of(context).validate()) {
+          await ref.read(signUpNotifierProvider.notifier).signUp();
+        }
+      },
     );
   }
 }
@@ -92,6 +103,11 @@ class _PasswordField extends HookConsumerWidget {
       validator: (value) => password.failureOrNull?.message,
       enabled: status != SignUpStatus.loading,
       obscureText: isHidden.value,
+      onFieldSubmitted: (value) async {
+        if (Form.of(context).validate()) {
+          await ref.read(signUpNotifierProvider.notifier).signUp();
+        }
+      },
       decoration: InputDecoration(
         hintText: 'Password',
         suffixIcon: Padding(

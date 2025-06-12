@@ -47,10 +47,16 @@ class _EmailField extends HookConsumerWidget {
     final email = ref.watch(signInNotifierProvider.select((s) => s.email));
     final status = ref.watch(signInNotifierProvider.select((s) => s.status));
     return TextFormField(
+      keyboardType: TextInputType.emailAddress,
       decoration: const InputDecoration(hintText: 'Email'),
       onChanged: ref.read(signInNotifierProvider.notifier).emailChanged,
       validator: (value) => email.failureOrNull?.message,
       enabled: !status.isLoading,
+      onFieldSubmitted: (value) async {
+        if (Form.of(context).validate()) {
+          await ref.read(signInNotifierProvider.notifier).signIn();
+        }
+      },
     );
   }
 }
@@ -73,6 +79,12 @@ class _PasswordField extends HookConsumerWidget {
       validator: (value) => password.failureOrNull?.message,
       enabled: !status.isLoading,
       obscureText: isHidden.value,
+      textInputAction: TextInputAction.go,
+      onFieldSubmitted: (value) async {
+        if (Form.of(context).validate()) {
+          await ref.read(signInNotifierProvider.notifier).signIn();
+        }
+      },
       decoration: InputDecoration(
         hintText: 'Password',
         suffixIcon: Padding(

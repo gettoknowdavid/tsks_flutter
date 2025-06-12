@@ -21,9 +21,14 @@ final class NoUserException extends TsksException {
   ]);
 }
 
-
 final class InvalidEmailOrPasswordException extends TsksException {
   const InvalidEmailOrPasswordException([
     super.message = 'Invalid email address or password.',
+  ]);
+}
+
+final class TsksTimeoutException extends TsksException {
+  const TsksTimeoutException([
+    super.message = 'The operation timed out. Please try again.',
   ]);
 }

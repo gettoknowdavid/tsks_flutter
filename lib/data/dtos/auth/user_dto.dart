@@ -1,10 +1,13 @@
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:json_annotation/json_annotation.dart';
 import 'package:tsks_flutter/domain/core/value_objects/value_objects.dart';
 import 'package:tsks_flutter/domain/models/auth/user.dart';
 
-final class UserDto with EquatableMixin {
+part 'user_dto.g.dart';
 
+@JsonSerializable()
+final class UserDto with EquatableMixin {
   const UserDto({
     required this.id,
     required this.fullName,
@@ -12,11 +15,25 @@ final class UserDto with EquatableMixin {
     this.photoURL,
     this.emailVerified = false,
   });
+
+  factory UserDto.fromJson(Map<String, dynamic> json) =>
+      _$UserDtoFromJson(json);
+
   factory UserDto.fromFirebaseUser(firebase_auth.User user) {
     return UserDto(
       id: user.uid,
       fullName: user.displayName!,
       email: user.email!,
+      photoURL: user.photoURL,
+      emailVerified: user.emailVerified,
+    );
+  }
+
+  factory UserDto.fromDomain(User user) {
+    return UserDto(
+      id: user.id.getOrCrash,
+      fullName: user.fullName.getOrCrash,
+      email: user.email.getOrCrash,
       photoURL: user.photoURL,
       emailVerified: user.emailVerified,
     );
@@ -42,4 +59,6 @@ final class UserDto with EquatableMixin {
       emailVerified: emailVerified,
     );
   }
+
+  Map<String, dynamic> toJson() => _$UserDtoToJson(this);
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 import 'package:tsks_flutter/domain/models/todos/collection.dart';
 import 'package:tsks_flutter/ui/todos/widgets/collection_icon_widget.dart';
 import 'package:tsks_flutter/ui/todos/widgets/collection_tasks_status_widget.dart';
@@ -10,6 +11,7 @@ class CollectionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
 
     return InkWell(
       onTap: () {},
@@ -26,20 +28,60 @@ class CollectionTile extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: ResponsiveValue<EdgeInsets>(
+            context,
+            conditionalValues: [
+              const Condition.largerThan(
+                name: PHONE,
+                value: EdgeInsets.all(20),
+              ),
+            ],
+            defaultValue: const EdgeInsets.all(14),
+          ).value,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CollectionIconWidget(collection: collection),
+              CollectionIconWidget(
+                collection: collection,
+                size: ResponsiveValue<double>(
+                  context,
+                  conditionalValues: [
+                    const Condition.largerThan(name: PHONE, value: 44),
+                  ],
+                  defaultValue: 34,
+                ).value,
+              ),
               const Spacer(),
               Text(
                 collection.title.getOrCrash,
-                style: theme.textTheme.titleLarge?.copyWith(fontSize: 20),
+                style: ResponsiveValue<TextStyle>(
+                  context,
+                  conditionalValues: [
+                    Condition.smallerThan(
+                      name: MOBILE,
+                      value: textTheme.titleSmall,
+                    ),
+                    Condition.largerThan(
+                      name: TABLET,
+                      value: textTheme.titleLarge?.copyWith(fontSize: 20),
+                    ),
+                  ],
+                  defaultValue: textTheme.titleMedium,
+                ).value,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
                 semanticsLabel: collection.title.getOrCrash,
               ),
-              const SizedBox(height: 8),
+              ResponsiveValue<Widget>(
+                context,
+                conditionalValues: [
+                  const Condition.largerThan(
+                    name: PHONE,
+                    value: SizedBox(height: 8),
+                  ),
+                ],
+                defaultValue: const SizedBox.shrink(),
+              ).value,
               CollectionTasksStatusWidget(collection: collection),
             ],
           ),

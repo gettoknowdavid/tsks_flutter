@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:tsks_flutter/constants/fake_models.dart';
 import 'package:tsks_flutter/domain/models/todos/collection.dart';
@@ -57,8 +58,14 @@ class CollectionsGrid extends StatelessWidget {
       enabled: isLoading,
       child: GridView.builder(
         padding: const EdgeInsets.symmetric(vertical: 24),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: ResponsiveValue<int>(
+            context,
+            conditionalValues: [
+              const Condition.largerThan(name: TABLET, value: 3),
+            ],
+            defaultValue: 2,
+          ).value,
           mainAxisSpacing: 16,
           crossAxisSpacing: 16,
         ),

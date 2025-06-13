@@ -44,6 +44,14 @@ abstract final class TsksTheme {
           padding: const EdgeInsets.symmetric(horizontal: 8),
         ),
       ),
+      dialogTheme: DialogThemeData(
+        shape: RoundedSuperellipseBorder(
+          borderRadius: const BorderRadiusGeometry.all(
+            Radius.circular(16),
+          ),
+          side: BorderSide(width: 2, color: colorScheme.secondaryContainer),
+        ),
+      ),
       inputDecorationTheme: InputDecorationTheme(
         contentPadding: const EdgeInsets.fromLTRB(22, 20, 22, 20),
         border: OutlineInputBorder(

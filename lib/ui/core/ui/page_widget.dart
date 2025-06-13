@@ -37,7 +37,8 @@ class PageWidget extends StatelessWidget {
           maxWidth: ResponsiveValue<double>(
             context,
             conditionalValues: [
-              const Condition.largerThan(name: MOBILE, value: 620),
+              const Condition.largerThan(name: MOBILE, value: 720),
+              const Condition.largerThan(name: DESKTOP, value: 1000),
             ],
             defaultValue: double.infinity,
           ).value,

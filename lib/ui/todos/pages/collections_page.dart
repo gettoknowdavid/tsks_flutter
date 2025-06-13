@@ -63,6 +63,7 @@ class CollectionsGrid extends StatelessWidget {
             context,
             conditionalValues: [
               const Condition.largerThan(name: TABLET, value: 3),
+              const Condition.largerThan(name: DESKTOP, value: 4),
             ],
             defaultValue: 2,
           ).value,

@@ -115,6 +115,10 @@ final class SignUpRoute extends GoRouteData with _$SignUpRoute {
           path: '/collections',
           name: 'Collections',
         ),
+        TypedGoRoute<CollectionRoute>(
+          path: '/collections/:uid',
+          name: 'Collection',
+        ),
       ],
     ),
     TypedStatefulShellBranch<SearchShellBranchData>(
@@ -180,6 +184,16 @@ final class CollectionsRoute extends GoRouteData with _$CollectionsRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const CollectionsPage();
+  }
+}
+
+final class CollectionRoute extends GoRouteData with _$CollectionRoute {
+  const CollectionRoute(this.uid);
+  final String uid;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const CollectionPage();
   }
 }
 

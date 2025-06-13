@@ -1,8 +1,7 @@
 part of 'router_notifier.dart';
 
 final class TsksRouterState with EquatableMixin {
-  const TsksRouterState()
-    : this._(redirectPath: '/', allowedPath: const []);
+  const TsksRouterState() : this._(redirectPath: '/', allowedPath: const []);
 
   const TsksRouterState._({
     required this.redirectPath,
@@ -16,7 +15,14 @@ final class TsksRouterState with EquatableMixin {
 
   TsksRouterState authenticated() => const TsksRouterState._(
     redirectPath: '/',
-    allowedPath: ['/', '/collections', '/search', '/notifications', '/me'],
+    allowedPath: [
+      '/',
+      '/collections',
+      '/collections/:uid',
+      '/search',
+      '/notifications',
+      '/me',
+    ],
   );
 
   TsksRouterState unauthenticated() => const TsksRouterState._(

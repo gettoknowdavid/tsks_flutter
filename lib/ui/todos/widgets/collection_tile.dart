@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:tsks_flutter/domain/models/todos/collection.dart';
+import 'package:tsks_flutter/routing/router_notifier.dart';
 import 'package:tsks_flutter/ui/todos/widgets/collection_icon_widget.dart';
 import 'package:tsks_flutter/ui/todos/widgets/collection_tasks_status_widget.dart';
 
@@ -12,10 +13,10 @@ class CollectionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-
+    final uid = collection.uid.getOrCrash;
+    
     return InkWell(
-      onTap: () {},
-      // onTap: () => context.push('/collections/${collection.uid}'),
+      onTap: () => CollectionRoute(uid).push<void>(context),
       borderRadius: const BorderRadius.all(Radius.circular(28)),
       child: Card(
         semanticContainer: false,

@@ -4,21 +4,17 @@ import 'package:flutter_iconpicker/Models/configuration.dart';
 import 'package:flutter_iconpicker/flutter_iconpicker.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:responsive_framework/responsive_framework.dart';
 import 'package:tsks_flutter/ui/core/ui/ui.dart';
 import 'package:tsks_flutter/ui/todos/providers/collection_form/collection_form.dart';
 import 'package:tsks_flutter/ui/todos/widgets/color_radio_button.dart';
 import 'package:tsks_flutter/ui/todos/widgets/widgets.dart';
 import 'package:tsks_flutter/utils/my_custom_icons.dart';
 
-class CollectionEditorDialog extends HookConsumerWidget {
-  const CollectionEditorDialog({super.key});
-
+class CollectionFormWidget extends HookConsumerWidget {
+  const CollectionFormWidget({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final formKey = useMemoized(GlobalKey<FormState>.new);
-
     final status = ref.watch(collectionFormProvider.select((s) => s.status));
 
     ref.listen(collectionFormProvider, (previous, next) {
@@ -34,50 +30,36 @@ class CollectionEditorDialog extends HookConsumerWidget {
       }
     });
 
-    return MaxWidthBox(
-      maxWidth: 560,
-      child: Dialog(
-        alignment: Alignment.topCenter,
-        insetPadding: const EdgeInsets.fromLTRB(40, 160, 40, 0),
-        shape: RoundedSuperellipseBorder(
-          borderRadius: const BorderRadiusGeometry.all(Radius.circular(16)),
-          side: BorderSide(
-            width: 2,
-            color: theme.colorScheme.secondaryContainer,
-          ),
-        ),
-        child: Form(
-          key: formKey,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
-            child: Column(
+    return Form(
+      key: formKey,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
+        child: Column(
+          children: [
+            const Row(
+              spacing: 8,
               children: [
-                const Row(
-                  spacing: 8,
-                  children: [
-                    _IconPickerField(key: Key('collectionForm_iconField')),
-                    Expanded(
-                      child: _TitleField(key: Key('collectionForm_titleField')),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                const _ColorPickerField(key: Key('collectionForm_colorField')),
-                const SizedBox(height: 16),
-                const _IsFavouriteField(key: Key('collectionForm_isFavField')),
-                const SizedBox(height: 32),
-                Row(
-                  spacing: 16,
-                  children: [
-                    const _SubmitButton(
-                      key: Key('collectionForm_submitButton'),
-                    ),
-                    CancelButton(enabled: !status.isLoading),
-                  ],
+                _IconPickerField(key: Key('collectionForm_iconField')),
+                Expanded(
+                  child: _TitleField(key: Key('collectionForm_titleField')),
                 ),
               ],
             ),
-          ),
+            const SizedBox(height: 16),
+            const _ColorPickerField(key: Key('collectionForm_colorField')),
+            const SizedBox(height: 16),
+            const _IsFavouriteField(key: Key('collectionForm_isFavField')),
+            const SizedBox(height: 32),
+            Row(
+              spacing: 16,
+              children: [
+                const _SubmitButton(
+                  key: Key('collectionForm_submitButton'),
+                ),
+                CancelButton(enabled: !status.isLoading),
+              ],
+            ),
+          ],
         ),
       ),
     );

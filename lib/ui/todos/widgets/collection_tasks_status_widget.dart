@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tsks_flutter/domain/models/todos/collection.dart';
+import 'package:tsks_flutter/ui/todos/widgets/check_mark.dart';
 import 'package:tsks_flutter/utils/utils.dart';
 
 class CollectionTasksStatusWidget extends StatelessWidget {
@@ -12,7 +13,7 @@ class CollectionTasksStatusWidget extends StatelessWidget {
     final accentColor = collection.colorARGB?.toColor;
     final effectiveAccentColor = accentColor ?? theme.colorScheme.secondary;
 
-    const doneTasks = 1;
+    const doneTasks = 2;
     const totalTasks = 2;
     final ratio = computeTasksRatio(doneTasks, totalTasks);
 
@@ -36,23 +37,6 @@ class CollectionTasksStatusWidget extends StatelessWidget {
                 ),
         ),
       ],
-    );
-  }
-}
-
-class CheckMark extends StatelessWidget {
-  const CheckMark({required this.color, super.key});
-  final Color? color;
-
-  @override
-  Widget build(BuildContext context) {
-    return CircleAvatar(
-      backgroundColor: color?.withValues(alpha: 0.5),
-      child: CircleAvatar(
-        backgroundColor: color,
-        radius: 8,
-        child: const Icon(Icons.check, size: 13),
-      ),
     );
   }
 }

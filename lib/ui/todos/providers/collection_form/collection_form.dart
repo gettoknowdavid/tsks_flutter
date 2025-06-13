@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:equatable/equatable.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:tsks_flutter/data/repositories/todos/collections_repository.dart';
@@ -16,7 +18,7 @@ class CollectionForm extends _$CollectionForm {
 
   void isFavouriteChanged(bool? value) => state = state.withIsFavourite(value);
 
-  void colorChanged(int value) => state = state.withColor(value);
+  void colorChanged(Color? value) => state = state.withColor(value);
 
   void iconChanged(Map<String, String> value) => state = state.withIcon(value);
 
@@ -26,7 +28,7 @@ class CollectionForm extends _$CollectionForm {
     final repository = ref.read(collectionsRepositoryProvider);
     final response = await repository.createCollection(
       title: state.title,
-      colorARGB: state.colorARGB,
+      colorARGB: state.color?.toARGB32(),
       iconMap: state.iconMap,
       isFavourite: state.isFavourite,
       createdAt: state.createdAt,

@@ -12,7 +12,7 @@ final class CollectionFormState with EquatableMixin {
     required this.title,
     required this.createdAt,
     this.isFavourite = false,
-    this.colorARGB,
+    this.color,
     this.iconMap,
     this.status = CollectionFormStatus.initial,
     this.exception,
@@ -20,7 +20,7 @@ final class CollectionFormState with EquatableMixin {
 
   final SingleLineString title;
   final bool isFavourite;
-  final int? colorARGB;
+  final Color? color;
   final Map<String, dynamic>? iconMap;
   final DateTime createdAt;
   final CollectionFormStatus status;
@@ -29,7 +29,7 @@ final class CollectionFormState with EquatableMixin {
   CollectionFormState withTitle(String title) {
     return CollectionFormState._(
       title: SingleLineString(title),
-      colorARGB: colorARGB,
+      color: color,
       iconMap: iconMap,
       isFavourite: isFavourite,
       createdAt: createdAt,
@@ -39,17 +39,17 @@ final class CollectionFormState with EquatableMixin {
   CollectionFormState withIsFavourite(bool? isFavouriteValue) {
     return CollectionFormState._(
       title: title,
-      colorARGB: colorARGB,
+      color: color,
       iconMap: iconMap,
       isFavourite: isFavouriteValue ?? isFavourite,
       createdAt: createdAt,
     );
   }
 
-  CollectionFormState withColor(int colorARGBValue) {
+  CollectionFormState withColor(Color? colorValue) {
     return CollectionFormState._(
       title: title,
-      colorARGB: colorARGBValue,
+      color: colorValue,
       iconMap: iconMap,
       isFavourite: isFavourite,
       createdAt: createdAt,
@@ -59,7 +59,7 @@ final class CollectionFormState with EquatableMixin {
   CollectionFormState withIcon(Map<String, String> iconMapValue) {
     return CollectionFormState._(
       title: title,
-      colorARGB: colorARGB,
+      color: color,
       iconMap: iconMapValue,
       isFavourite: isFavourite,
       createdAt: createdAt,
@@ -69,7 +69,7 @@ final class CollectionFormState with EquatableMixin {
   CollectionFormState withSubmissionInProgress() {
     return CollectionFormState._(
       title: title,
-      colorARGB: colorARGB,
+      color: color,
       iconMap: iconMap,
       isFavourite: isFavourite,
       createdAt: createdAt,
@@ -80,7 +80,7 @@ final class CollectionFormState with EquatableMixin {
   CollectionFormState withSubmissionFailure(TsksException exception) {
     return CollectionFormState._(
       title: title,
-      colorARGB: colorARGB,
+      color: color,
       iconMap: iconMap,
       isFavourite: isFavourite,
       createdAt: createdAt,
@@ -92,7 +92,7 @@ final class CollectionFormState with EquatableMixin {
   CollectionFormState withSubmissionSuccess(dynamic unit) {
     return CollectionFormState._(
       title: title,
-      colorARGB: colorARGB,
+      color: color,
       iconMap: iconMap,
       isFavourite: isFavourite,
       createdAt: createdAt,
@@ -106,7 +106,7 @@ final class CollectionFormState with EquatableMixin {
   List<Object?> get props => [
     title,
     isFavourite,
-    colorARGB,
+    color,
     iconMap,
     createdAt,
     status,
@@ -122,3 +122,26 @@ extension CollectionFormStatusX on CollectionFormStatus {
   bool get isSuccess => this == CollectionFormStatus.success;
   bool get isFailure => this == CollectionFormStatus.failure;
 }
+
+const List<Color> collectionColors = [
+  Color(0xFFA5A5A5),
+  Color(0xFFFC76A1),
+  Color(0xFFDBBE56),
+  Color(0xFFE39264),
+  Color(0xFFD25A61),
+  Color(0xFFAE68E6),
+  Color(0xFF70C4BF),
+  Color(0xFF9E7F72),
+  Color(0xFF145DA0),
+  Color(0xFFFC2E20),
+  Color(0xFF1D741B),
+  Color(0xFFFF8882),
+  Color(0xFF9C2D41),
+  Color(0xFFED760E),
+  Color(0xFF642424),
+  Color(0xFF6D6552),
+  Color(0xFF924E7D),
+  Color(0xFFCB2821),
+  Color(0xFF2271B3),
+  Color(0xFFffdc00),
+];

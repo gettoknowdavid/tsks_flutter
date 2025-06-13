@@ -22,7 +22,13 @@ class PageHeaderWidget extends StatelessWidget {
           SizedBox.square(
             dimension: 30,
             child: IconButton.filled(
-              onPressed: () => Navigator.maybeOf(context),
+              onPressed: () {
+                if (Navigator.canPop(context)) {
+                  Navigator.pop(context);
+                } else {
+                  Navigator.maybeOf(context);
+                }
+              },
               style: IconButton.styleFrom(
                 padding: const EdgeInsets.all(2),
                 shape: const RoundedSuperellipseBorder(

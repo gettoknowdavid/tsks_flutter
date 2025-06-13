@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_iconpicker/Serialization/icondata_serialization.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:tsks_flutter/domain/models/todos/collection.dart';
 import 'package:tsks_flutter/utils/color_to_int_extension.dart';
 
-class CollectionIconWidget extends StatelessWidget {
+final class CollectionIconWidget extends StatelessWidget {
   const CollectionIconWidget({
     required this.collection,
     super.key,
@@ -21,8 +22,8 @@ class CollectionIconWidget extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final color = collection.colorARGB?.toColor;
 
-    // final iconMap = collection.iconMap;
-    // final icon = iconMap != null ? deserializeIcon(iconMap) : null;
+    final iconMap = collection.iconMap;
+    final icon = iconMap != null ? deserializeIcon(iconMap) : null;
 
     return Skeleton.leaf(
       child: Container(
@@ -31,7 +32,9 @@ class CollectionIconWidget extends StatelessWidget {
         decoration: BoxDecoration(color: color, borderRadius: borderRadius),
         child: IconTheme(
           data: IconThemeData(size: size * 0.7, color: colorScheme.onSurface),
-          child: const Icon(PhosphorIconsBold.snowflake),
+          child: icon == null
+              ? const Icon(PhosphorIconsBold.snowflake)
+              : Icon(icon.data),
         ),
       ),
     );

@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_iconpicker/Models/configuration.dart';
+import 'package:flutter_iconpicker/flutter_iconpicker.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:tsks_flutter/ui/core/ui/ui.dart';
 import 'package:tsks_flutter/ui/todos/providers/collection_form/collection_form.dart';
 import 'package:tsks_flutter/ui/todos/widgets/color_radio_button.dart';
 import 'package:tsks_flutter/ui/todos/widgets/widgets.dart';
+import 'package:tsks_flutter/utils/my_custom_icons.dart';
 
 class CollectionEditorDialog extends HookConsumerWidget {
   const CollectionEditorDialog({super.key});
@@ -48,15 +52,19 @@ class CollectionEditorDialog extends HookConsumerWidget {
             padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
             child: Column(
               children: [
-                const _TitleField(key: Key('collectionForm_titleField')),
-                const SizedBox(height: 16),
-                const _ColorPickerField(
-                  key: Key('collectionForm_colorPickerField'),
+                const Row(
+                  spacing: 8,
+                  children: [
+                    _IconPickerField(key: Key('collectionForm_iconField')),
+                    Expanded(
+                      child: _TitleField(key: Key('collectionForm_titleField')),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
-                const _IsFavouriteField(
-                  key: Key('collectionForm_isFavouriteField'),
-                ),
+                const _ColorPickerField(key: Key('collectionForm_colorField')),
+                const SizedBox(height: 16),
+                const _IsFavouriteField(key: Key('collectionForm_isFavField')),
                 const SizedBox(height: 32),
                 Row(
                   spacing: 16,
@@ -80,10 +88,15 @@ class _TitleField extends HookConsumerWidget {
   const _TitleField({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = Theme.of(context).colorScheme;
     final title = ref.watch(collectionFormProvider.select((s) => s.title));
     final status = ref.watch(collectionFormProvider.select((s) => s.status));
     return TextFormField(
-      decoration: const InputDecoration(hintText: 'Collection title'),
+      decoration: InputDecoration(
+        hintText: 'Collection title',
+        fillColor: colors.surfaceContainer,
+        filled: true,
+      ),
       onChanged: ref.read(collectionFormProvider.notifier).titleChanged,
       validator: (value) => title.failureOrNull?.message,
       enabled: !status.isLoading,
@@ -104,7 +117,7 @@ class _IsFavouriteField extends ConsumerWidget {
     final colors = Theme.of(context).colorScheme;
     final status = ref.watch(collectionFormProvider.select((s) => s.status));
     return CheckboxListTile(
-      tileColor: colors.surfaceContainer.withValues(alpha: 0.5),
+      tileColor: colors.surfaceContainer,
       value: ref.watch(collectionFormProvider).isFavourite,
       onChanged: ref.read(collectionFormProvider.notifier).isFavouriteChanged,
       title: const Text('Add to favourite'),
@@ -126,7 +139,7 @@ class _ColorPickerField extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 20),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainer.withValues(alpha: 0.5),
+        color: theme.colorScheme.surfaceContainer,
         borderRadius: const BorderRadiusGeometry.all(Radius.circular(12)),
       ),
       child: Column(
@@ -151,6 +164,64 @@ class _ColorPickerField extends ConsumerWidget {
         ],
       ),
     );
+  }
+}
+
+class _IconPickerField extends ConsumerWidget {
+  const _IconPickerField({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colors = Theme.of(context).colorScheme;
+    final iconMap = ref.watch(collectionFormProvider.select((s) => s.iconMap));
+    final deserializedIcon = iconMap != null ? deserializeIcon(iconMap) : null;
+    return SizedBox.square(
+      dimension: 56,
+      child: IconButton.filled(
+        icon: deserializedIcon != null
+            ? Icon(deserializedIcon.data)
+            : const Icon(PhosphorIconsBold.snowflake),
+        onPressed: () async {
+          final selectedIcon = await showIconPicker(
+            context,
+            configuration: SinglePickerConfiguration(
+              constraints: const BoxConstraints(
+                maxWidth: 560,
+                minWidth: 420,
+                minHeight: 420,
+                maxHeight: 600,
+              ),
+              backgroundColor: colors.surfaceContainer,
+              preSelected: deserializedIcon,
+              showTooltips: true,
+              adaptiveDialog: true,
+              iconPackModes: <IconPack>[IconPack.custom],
+              customIconPack: myCustomIcons,
+              searchComparator: _searchComparator,
+              iconSize: 32,
+            ),
+          );
+          if (selectedIcon == null) return;
+          final serializedIcon = serializeIcon(selectedIcon)!;
+          ref.read(collectionFormProvider.notifier).iconChanged(serializedIcon);
+        },
+        style: IconButton.styleFrom(
+          backgroundColor: colors.surfaceContainer,
+          foregroundColor: colors.onSurface,
+          shape: const RoundedSuperellipseBorder(
+            borderRadius: BorderRadiusGeometry.all(Radius.circular(12)),
+          ),
+        ),
+        tooltip: 'Pick a collection icon',
+      ),
+    );
+  }
+
+  bool _searchComparator(String search, IconPickerIcon icon) {
+    return search.toLowerCase().contains(
+          icon.name.replaceAll('_', ' ').toLowerCase(),
+        ) ||
+        icon.name.toLowerCase().contains(search.toLowerCase());
   }
 }
 

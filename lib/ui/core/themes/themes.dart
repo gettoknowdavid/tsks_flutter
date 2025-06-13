@@ -71,6 +71,7 @@ abstract final class TsksTheme {
           borderSide: BorderSide(width: 2, color: colorScheme.outlineVariant),
         ),
       ),
+      fontFamily: TsksTypography.fontFamily,
     );
 
     return baseTheme.copyWith(

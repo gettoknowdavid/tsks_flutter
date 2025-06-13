@@ -56,7 +56,7 @@ final class CollectionFormState with EquatableMixin {
     );
   }
 
-  CollectionFormState withIcon(Map<String, String> iconMapValue) {
+  CollectionFormState withIcon(Map<String, dynamic> iconMapValue) {
     return CollectionFormState._(
       title: title,
       color: color,

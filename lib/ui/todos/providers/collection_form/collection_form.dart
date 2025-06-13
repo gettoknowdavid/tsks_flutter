@@ -20,7 +20,7 @@ class CollectionForm extends _$CollectionForm {
 
   void colorChanged(Color? value) => state = state.withColor(value);
 
-  void iconChanged(Map<String, String> value) => state = state.withIcon(value);
+  void iconChanged(Map<String, dynamic> value) => state = state.withIcon(value);
 
   Future<void> submit() async {
     if (!state.isFormValid) return;

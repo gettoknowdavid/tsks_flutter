@@ -14,15 +14,6 @@ class CheckMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // return CircleAvatar(
-    //   backgroundColor: color?.withValues(alpha: 0.5),
-    //   child: CircleAvatar(
-    //     backgroundColor: color,
-    //     radius: 8,
-    //     child: const Icon(Icons.check, size: 13),
-    //   ),
-    // );
-
     return Container(
       decoration: BoxDecoration(
         color: color?.withValues(alpha: 0.5),

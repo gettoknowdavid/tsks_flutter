@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 
 class TinyLoadingIndicator extends StatelessWidget {
-  const TinyLoadingIndicator({super.key});
+  const TinyLoadingIndicator({this.diameter = 16, super.key});
+  final double? diameter;
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    final colors = Theme.of(context).colorScheme;
+    return Center(
       child: SizedBox.square(
-        dimension: 20,
-        child: CircularProgressIndicator(),
+        dimension: diameter,
+        child: CircularProgressIndicator(color: colors.onSurface),
       ),
     );
   }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +12,7 @@ import 'package:tsks_flutter/firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   if (kIsWeb) {
     GoRouter.optionURLReflectsImperativeAPIs = true;
     usePathUrlStrategy();
@@ -24,4 +26,24 @@ Future<void> main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(const ProviderScope(child: TsksApp()));
+}
+
+class RiverpodLogger extends ProviderObserver {
+  @override
+  void didUpdateProvider(
+    ProviderBase<Object?> provider,
+    Object? previousValue,
+    Object? newValue,
+    ProviderContainer container,
+  ) {
+    log(
+      '''
+      ##########
+        PROVIDER: $provider,
+        PREVIOUS_VALUE: $previousValue,
+        NEW_VALUE: $newValue
+      ##########
+      ''',
+    );
+  }
 }

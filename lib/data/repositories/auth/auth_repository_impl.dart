@@ -7,7 +7,6 @@ import 'package:tsks_flutter/domain/core/value_objects/value_objects.dart';
 import 'package:tsks_flutter/domain/models/auth/user.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-
   const AuthRepositoryImpl({required firebase_auth.FirebaseAuth firebaseAuth})
     : _firebaseAuth = firebaseAuth;
   final firebase_auth.FirebaseAuth _firebaseAuth;

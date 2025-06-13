@@ -20,6 +20,7 @@ class PageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
         child: MaxWidthBox(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           maxWidth: ResponsiveValue<double>(

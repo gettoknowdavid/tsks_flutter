@@ -3,7 +3,7 @@ import 'package:tsks_flutter/domain/core/value_objects/value_objects.dart';
 
 final class Collection with EquatableMixin {
   const Collection({
-    required this.id,
+    required this.uid,
     required this.title,
     this.isFavourite = false,
     this.colorARGB,
@@ -11,7 +11,7 @@ final class Collection with EquatableMixin {
     this.createdAt,
   });
 
-  final Id id;
+  final Uid uid;
   final SingleLineString title;
   final bool isFavourite;
   final int? colorARGB;
@@ -19,13 +19,13 @@ final class Collection with EquatableMixin {
   final DateTime? createdAt;
 
   static Collection empty = Collection(
-    id: Id.fromString(''),
+    uid: Uid(''),
     title: SingleLineString(''),
   );
 
   @override
   List<Object?> get props => [
-    id,
+    uid,
     title,
     isFavourite,
     colorARGB,

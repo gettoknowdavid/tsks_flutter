@@ -1,11 +1,8 @@
 import 'package:equatable/equatable.dart';
-import 'package:json_annotation/json_annotation.dart';
 import 'package:tsks_flutter/domain/core/value_objects/value_objects.dart';
 import 'package:tsks_flutter/domain/models/todos/collection.dart';
 
-part 'collection_dto.g.dart';
 
-@JsonSerializable()
 final class CollectionDto with EquatableMixin {
   const CollectionDto({
     required this.uid,
@@ -16,8 +13,18 @@ final class CollectionDto with EquatableMixin {
     this.createdAt,
   });
 
-  factory CollectionDto.fromJson(Map<String, dynamic> json) =>
-      _$CollectionDtoFromJson(json);
+  factory CollectionDto.fromFirestore(String uid, Map<String, dynamic> json) {
+    return CollectionDto(
+      uid: uid,
+      title: json['title'] as String,
+      isFavourite: json['isFavourite'] as bool? ?? false,
+      colorARGB: (json['colorARGB'] as num?)?.toInt(),
+      iconMap: json['iconMap'] as Map<String, dynamic>?,
+      createdAt: json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
+    );
+  }
 
   factory CollectionDto.fromDomain(Collection collection) {
     return CollectionDto(
@@ -46,7 +53,14 @@ final class CollectionDto with EquatableMixin {
     iconMap,
     createdAt,
   ];
-  Map<String, dynamic> toJson() => _$CollectionDtoToJson(this);
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    'uid': uid,
+    'title': title,
+    'isFavourite': isFavourite,
+    'colorARGB': colorARGB,
+    'iconMap': iconMap,
+    'createdAt': createdAt?.toIso8601String(),
+  };
 
   Collection toDomain() {
     return Collection(
@@ -56,6 +70,24 @@ final class CollectionDto with EquatableMixin {
       colorARGB: colorARGB,
       iconMap: iconMap,
       createdAt: createdAt,
+    );
+  }
+
+  CollectionDto copyWith({
+    String? uid,
+    String? title,
+    bool? isFavourite,
+    int? colorARGB,
+    Map<String, dynamic>? iconMap,
+    DateTime? createdAt,
+  }) {
+    return CollectionDto(
+      uid: uid ?? this.uid,
+      title: title ?? this.title,
+      isFavourite: isFavourite ?? this.isFavourite,
+      colorARGB: colorARGB ?? this.colorARGB,
+      iconMap: iconMap ?? this.iconMap,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 }

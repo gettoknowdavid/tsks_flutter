@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fpdart/fpdart.dart';
@@ -32,19 +31,19 @@ final class CollectionsRepository {
   }
 
   Future<Either<TsksException, Unit>> createCollection({
-    required Id id,
     required SingleLineString title,
+    required DateTime createdAt,
     bool? isFavourite = false,
     int? colorARGB,
     Map<String, dynamic>? iconMap,
   }) async {
     try {
-      await _collectionRef.doc(id.getOrCrash).set({
-        'id': id.getOrCrash,
+      await _collectionRef.add({
         'title': title.getOrCrash,
         'isFavourite': isFavourite,
         'colorARGB': colorARGB,
         'iconMap': iconMap,
+        'createdAt': createdAt.toIso8601String(),
       });
       return const Right(unit);
     } on TimeoutException {
@@ -54,13 +53,16 @@ final class CollectionsRepository {
     }
   }
 
-  Future<Either<TsksException, List<Collection>>> getCollections() async {
+  Future<Either<TsksException, List<Collection?>>> getCollections() async {
     try {
-      final querySnapshot = await _collectionRef.collectionConverter.get();
-      log(querySnapshot.docs.map((s) => s.data()).toString());
+      final querySnapshot = await _collectionRef.collectionConverter
+          .orderBy('createdAt', descending: true)
+          .get();
+
       final collections = querySnapshot.docs
-          .map((snapshot) => snapshot.data().toDomain())
+          .map((snapshot) => snapshot.data()?.toDomain())
           .toList();
+
       return Right(collections);
     } on TimeoutException {
       return const Left(TsksTimeoutException());

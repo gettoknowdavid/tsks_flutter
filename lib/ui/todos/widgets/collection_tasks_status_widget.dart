@@ -9,11 +9,11 @@ class CollectionTasksStatusWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
     final accentColor = collection.colorARGB?.toColor;
+    final effectiveAccentColor = accentColor ?? theme.colorScheme.secondary;
 
-    const doneTasks = 0;
-    const totalTasks = 0;
+    const doneTasks = 1;
+    const totalTasks = 2;
     final ratio = computeTasksRatio(doneTasks, totalTasks);
 
     return Row(
@@ -22,16 +22,16 @@ class CollectionTasksStatusWidget extends StatelessWidget {
         Text(
           '$doneTasks/$totalTasks done',
           style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+            color: theme.colorScheme.outline,
           ),
         ),
         SizedBox.square(
           dimension: 24,
           child: ratio == 1
-              ? CheckMark(color: accentColor)
+              ? CheckMark(color: effectiveAccentColor)
               : CircularProgressIndicator(
                   value: ratio,
-                  color: accentColor,
+                  color: effectiveAccentColor,
                   strokeAlign: -1,
                 ),
         ),
@@ -47,11 +47,11 @@ class CheckMark extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CircleAvatar(
-      backgroundColor: color?.withValues(alpha: 0.55),
+      backgroundColor: color?.withValues(alpha: 0.5),
       child: CircleAvatar(
         backgroundColor: color,
         radius: 8,
-        child: const Icon(Icons.check, size: 14),
+        child: const Icon(Icons.check, size: 13),
       ),
     );
   }

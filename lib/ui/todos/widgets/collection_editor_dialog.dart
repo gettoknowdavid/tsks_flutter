@@ -12,6 +12,22 @@ class CollectionEditorDialog extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final formKey = useMemoized(GlobalKey<FormState>.new);
+
+    final status = ref.watch(collectionFormProvider.select((s) => s.status));
+
+    ref.listen(collectionFormProvider, (previous, next) {
+      if (previous?.status == next.status) return;
+      switch (next.status) {
+        case CollectionFormStatus.initial:
+        case CollectionFormStatus.loading:
+          return;
+        case CollectionFormStatus.failure:
+          context.showErrorSnackBar(next.exception?.message);
+        case CollectionFormStatus.success:
+          Navigator.pop(context);
+      }
+    });
+
     return MaxWidthBox(
       maxWidth: 560,
       child: Dialog(
@@ -26,19 +42,23 @@ class CollectionEditorDialog extends HookConsumerWidget {
         ),
         child: Form(
           key: formKey,
-          child: const SingleChildScrollView(
-            padding: EdgeInsets.fromLTRB(24, 32, 24, 32),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
             child: Column(
               children: [
-                _TitleField(key: Key('collectionForm_titleField')),
-                SizedBox(height: 16),
-                _IsFavouriteField(key: Key('collectionForm_isFavouriteField')),
-                SizedBox(height: 32),
+                const _TitleField(key: Key('collectionForm_titleField')),
+                const SizedBox(height: 16),
+                const _IsFavouriteField(
+                  key: Key('collectionForm_isFavouriteField'),
+                ),
+                const SizedBox(height: 32),
                 Row(
                   spacing: 16,
                   children: [
-                    _SubmitButton(key: Key('collectionForm_submitButton')),
-                    CancelButton(),
+                    const _SubmitButton(
+                      key: Key('collectionForm_submitButton'),
+                    ),
+                    CancelButton(enabled: !status.isLoading),
                   ],
                 ),
               ],
@@ -97,16 +117,19 @@ class _SubmitButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final status = ref.watch(collectionFormProvider.select((s) => s.status));
+
+    Future<void> submit() async {
+      if (!Form.of(context).validate()) return;
+      await ref.watch(collectionFormProvider.notifier).submit();
+    }
+
     return SizedBox(
       height: 52,
       child: FilledButton(
         style: FilledButton.styleFrom(),
-        onPressed: () {
-          if (!Form.of(context).validate()) return;
-          ref.watch(collectionFormProvider.notifier).submit();
-        },
+        onPressed: status.isLoading ? null : submit,
         child: status.isLoading
-            ? const TinyLoadingIndicator()
+            ? const Text('Submitting...')
             : const Text('Add Collection'),
       ),
     );

@@ -111,15 +111,15 @@ class _SignInButton extends ConsumerWidget {
       signInNotifierProvider.select((s) => s.status.isLoading),
     );
 
-    Future<void> signUp() async {
+    Future<void> signIn() async {
       if (Form.of(context).validate()) {
         await ref.read(signInNotifierProvider.notifier).signIn();
       }
     }
 
     return FilledButton(
-      onPressed: isLoading ? null : signUp,
-      child: isLoading ? const TinyLoadingIndicator() : const Text('Sign up'),
+      onPressed: isLoading ? null : signIn,
+      child: isLoading ? const TinyLoadingIndicator() : const Text('Sign in'),
     );
   }
 }

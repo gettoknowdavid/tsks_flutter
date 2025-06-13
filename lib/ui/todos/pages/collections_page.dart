@@ -13,9 +13,12 @@ class CollectionsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return const PageWidget(
-      title: 'Collections',
-      content: CollectionsGridWidget(),
+    return RefreshIndicator(
+      onRefresh: () => ref.refresh(collectionsProvider.future),
+      child: const PageWidget(
+        title: 'Collections',
+        content: CollectionsGridWidget(),
+      ),
     );
   }
 }
@@ -50,13 +53,12 @@ class CollectionsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (collections.isEmpty) return const SizedBox();
     return Skeletonizer(
       enabled: isLoading,
       child: GridView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        padding: const EdgeInsets.symmetric(vertical: 24),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
+          crossAxisCount: 3,
           mainAxisSpacing: 16,
           crossAxisSpacing: 16,
         ),

@@ -13,7 +13,7 @@ FirebaseFirestore firestore(Ref ref) => FirebaseFirestore.instance;
 extension DocumentSnapshotX on DocumentSnapshot {
   CollectionDto? get firestoreToCollectionDto {
     final json = data() as Map<String, dynamic>?;
-    return json == null ? null : CollectionDto.fromJson(json);
+    return json == null ? null : CollectionDto.fromFirestore(id, json);
   }
 }
 
@@ -25,9 +25,9 @@ extension CollectionReferenceX on CollectionReference {
     );
   }
 
-  CollectionReference<CollectionDto> get collectionConverter {
+  CollectionReference<CollectionDto?> get collectionConverter {
     return withConverter<CollectionDto>(
-      fromFirestore: (s, _) => CollectionDto.fromJson(s.data()!),
+      fromFirestore: (s, _) => CollectionDto.fromFirestore(s.id, s.data()!),
       toFirestore: (value, _) => value.toJson(),
     );
   }

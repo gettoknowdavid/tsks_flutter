@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:tsks_flutter/domain/models/todos/collection.dart';
 import 'package:tsks_flutter/routing/router_notifier.dart';
+import 'package:tsks_flutter/ui/todos/providers/collection/collection_notifier.dart';
 import 'package:tsks_flutter/ui/todos/widgets/collection_icon_widget.dart';
 import 'package:tsks_flutter/ui/todos/widgets/collection_tasks_status_widget.dart';
 
-class CollectionTile extends StatelessWidget {
+class CollectionTile extends ConsumerWidget {
   const CollectionTile({required this.collection, super.key});
   final Collection collection;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    final uid = collection.uid.getOrCrash;
-    
+
     return InkWell(
-      onTap: () => CollectionRoute(uid).push<void>(context),
+      onTap: () {
+        ref.read(collectionNotifierProvider.notifier).fetch(collection);
+        CollectionRoute(collection.uid.getOrCrash).push<void>(context);
+      },
       borderRadius: const BorderRadius.all(Radius.circular(28)),
       child: Card(
         semanticContainer: false,

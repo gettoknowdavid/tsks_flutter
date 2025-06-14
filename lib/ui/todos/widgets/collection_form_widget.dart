@@ -96,9 +96,12 @@ class _TitleField extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).colorScheme;
+    final focusNode = useFocusNode();
     final title = ref.watch(collectionFormProvider.select((s) => s.title));
     final status = ref.watch(collectionFormProvider.select((s) => s.status));
     return TextFormField(
+      focusNode: focusNode,
+      autofocus: true,
       decoration: InputDecoration(
         hintText: 'Collection title',
         fillColor: colors.surfaceContainer,
@@ -110,6 +113,7 @@ class _TitleField extends HookConsumerWidget {
       enabled: !status.isLoading,
       onFieldSubmitted: (value) async {
         if (Form.of(context).validate()) {
+          FocusScope.of(context).unfocus();
           await ref.read(collectionFormProvider.notifier).submit();
         }
       },

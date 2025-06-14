@@ -35,3 +35,19 @@ extension CollectionReferenceX on CollectionReference {
     );
   }
 }
+
+extension DocumentReferenceX on DocumentReference {
+  DocumentReference<CollectionDto?> get collectionConverter {
+    return withConverter<CollectionDto>(
+      fromFirestore: (s, _) => CollectionDto.fromFirestore(s.id, s.data()!),
+      toFirestore: (value, _) => value.toJson(),
+    );
+  }
+
+  DocumentReference<TodoDto?> get todoConverter {
+    return withConverter<TodoDto>(
+      fromFirestore: (s, _) => TodoDto.fromFirestore(s.id, s.data()!),
+      toFirestore: (value, _) => value.toJson(),
+    );
+  }
+}

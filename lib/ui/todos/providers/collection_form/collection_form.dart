@@ -41,14 +41,11 @@ class CollectionForm extends _$CollectionForm {
 
     // If editing, but no changes were made, we can consider it a success
     // and avoid a pointless database write.
-    if (isEditing && !state.hasChanges) {
-      state = state.withSubmissionSuccess(unit);
-      return;
-    }
+    if (isEditing && !state.hasChanges) return;
 
     state = state.withSubmissionInProgress();
     final repository = ref.read(collectionsRepositoryProvider);
-    final Either<TsksException, Unit> response;
+    final Either<TsksException, Collection> response;
 
     if (isEditing) {
       final dataToUpdate = <String, dynamic>{};

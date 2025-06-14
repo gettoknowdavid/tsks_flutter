@@ -7,7 +7,7 @@ import 'package:tsks_flutter/domain/core/value_objects/uid.dart';
 import 'package:tsks_flutter/routing/router_notifier.dart';
 import 'package:tsks_flutter/ui/core/ui/page_widget.dart';
 import 'package:tsks_flutter/ui/todos/providers/collection_form/collection_form.dart';
-import 'package:tsks_flutter/ui/todos/providers/collection_provider.dart';
+import 'package:tsks_flutter/ui/todos/providers/collection_notifier.dart';
 import 'package:tsks_flutter/ui/todos/widgets/add_new_collection_button.dart';
 
 class CollectionPage extends ConsumerWidget {
@@ -61,7 +61,7 @@ class _Title extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final uidStr = ref.read(routerConfigProvider).state.pathParameters['uid'];
     final uid = Uid(uidStr ?? '');
-    final collection = ref.watch(collectionProvider(uid));
+    final collection = ref.watch(collectionNotifierProvider(uid));
 
     return switch (collection) {
       AsyncError() => const PageTitle('An error occurred'),
@@ -96,7 +96,7 @@ class _MoreOptions extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final uidStr = ref.read(routerConfigProvider).state.pathParameters['uid'];
     final uid = Uid(uidStr ?? '');
-    final collection = ref.watch(collectionProvider(uid)).valueOrNull;
+    final collection = ref.watch(collectionNotifierProvider(uid)).valueOrNull;
     return PopupMenuButton<String>(
       child: const Icon(PhosphorIconsBold.dotsThree),
       onSelected: (String value) {

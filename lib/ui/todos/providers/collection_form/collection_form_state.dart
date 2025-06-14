@@ -17,6 +17,7 @@ final class CollectionFormState with EquatableMixin {
     this.status = CollectionFormStatus.initial,
     this.exception,
     this.initialCollection,
+    this.newCollection,
   });
 
   final SingleLineString title;
@@ -27,6 +28,7 @@ final class CollectionFormState with EquatableMixin {
   final CollectionFormStatus status;
   final TsksException? exception;
   final Collection? initialCollection;
+  final Collection? newCollection;
 
   CollectionFormState withTitle(String title) {
     return CollectionFormState._(
@@ -108,15 +110,16 @@ final class CollectionFormState with EquatableMixin {
     );
   }
 
-  CollectionFormState withSubmissionSuccess(dynamic unit) {
+  CollectionFormState withSubmissionSuccess(Collection newCollection) {
     return CollectionFormState._(
       title: title,
       color: color,
       iconMap: iconMap,
       isFavourite: isFavourite,
       createdAt: createdAt,
-      initialCollection: initialCollection,
       status: CollectionFormStatus.success,
+      initialCollection: initialCollection,
+      newCollection: newCollection,
     );
   }
 
@@ -150,6 +153,7 @@ final class CollectionFormState with EquatableMixin {
     status,
     exception,
     initialCollection,
+    newCollection,
   ];
 }
 

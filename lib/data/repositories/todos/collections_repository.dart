@@ -30,7 +30,7 @@ final class CollectionsRepository {
     return _userDocRef.collection('collections');
   }
 
-  Future<Either<TsksException, Unit>> createCollection({
+  Future<Either<TsksException, Collection>> createCollection({
     required SingleLineString title,
     required DateTime createdAt,
     bool? isFavourite = false,
@@ -38,14 +38,22 @@ final class CollectionsRepository {
     Map<String, dynamic>? iconMap,
   }) async {
     try {
-      await _collectionRef.add({
+      final documentReference = await _collectionRef.add({
         'title': title.getOrCrash,
         'isFavourite': isFavourite,
         'colorARGB': colorARGB,
         'iconMap': iconMap,
         'createdAt': createdAt.toIso8601String(),
       });
-      return const Right(unit);
+
+      final snapshot = await documentReference.collectionConverter.get();
+      final collectionDto = snapshot.data();
+
+      if (collectionDto == null) {
+        return const Left(TsksException('An error unknown occurred.'));
+      }
+
+      return Right(collectionDto.toDomain());
     } on TimeoutException {
       return const Left(TsksTimeoutException());
     } on Exception catch (e) {
@@ -53,15 +61,25 @@ final class CollectionsRepository {
     }
   }
 
-  Future<Either<TsksException, Unit>> updateCollection({
+  Future<Either<TsksException, Collection>> updateCollection({
     required Uid uid,
     required Map<String, dynamic> data,
   }) async {
     if (data.isEmpty) return const Left(NoCollectionFoundException());
 
     try {
+      final documentReference = _collectionRef.doc(uid.getOrCrash);
+
       await _collectionRef.doc(uid.getOrCrash).update(data);
-      return const Right(unit);
+
+      final snapshot = await documentReference.collectionConverter.get();
+      final collectionDto = snapshot.data();
+
+      if (collectionDto == null) {
+        return const Left(TsksException('An error unknown occurred.'));
+      }
+
+      return Right(collectionDto.toDomain());
     } on TimeoutException {
       return const Left(TsksTimeoutException());
     } on Exception catch (e) {

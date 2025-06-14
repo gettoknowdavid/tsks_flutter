@@ -7,13 +7,33 @@ import 'package:tsks_flutter/ui/todos/providers/collection_filter.dart';
 part 'collections_provider.g.dart';
 
 @riverpod
-FutureOr<List<Collection?>> allCollections(Ref ref) async {
-  final repository = ref.read(collectionsRepositoryProvider);
-  final response = await repository.getCollections();
-  return response.fold(
-    (exception) => throw exception,
-    (collections) => collections,
-  );
+class AllCollections extends _$AllCollections {
+  @override
+  FutureOr<List<Collection?>> build() async {
+    final repository = ref.read(collectionsRepositoryProvider);
+    final response = await repository.getCollections();
+    return response.fold(
+      (exception) => throw exception,
+      (collections) => collections,
+    );
+  }
+
+  void optimisticallyUpdate(Collection collection) {
+    state.whenData((collections) {
+      if (collections.isEmpty) {
+        state = AsyncData([collection]);
+      } else {
+        final currentCollections = [...collections];
+        final index = collections.indexWhere((c) => c?.uid == collection.uid);
+        if (index == -1) {
+          state = AsyncData([collection, ...collections]);
+        } else {
+          currentCollections[index] = collection;
+          state = AsyncData(currentCollections);
+        }
+      }
+    });
+  }
 }
 
 @riverpod
@@ -24,7 +44,7 @@ List<Collection?> filteredCollections(Ref ref) {
   if (allCollectionsAsyncValue is AsyncError) return [];
 
   final all = allCollectionsAsyncValue.valueOrNull ?? [];
- 
+
   if (all.isEmpty) return [];
 
   switch (filter) {

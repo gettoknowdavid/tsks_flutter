@@ -6,6 +6,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:tsks_flutter/ui/core/ui/ui.dart';
 import 'package:tsks_flutter/ui/todos/providers/collection_form/collection_form.dart';
+import 'package:tsks_flutter/ui/todos/providers/collection_notifier.dart';
+import 'package:tsks_flutter/ui/todos/providers/collections/collections_provider.dart';
 import 'package:tsks_flutter/ui/todos/widgets/color_radio_button.dart';
 import 'package:tsks_flutter/ui/todos/widgets/widgets.dart';
 import 'package:tsks_flutter/utils/my_custom_icons.dart';
@@ -17,6 +19,9 @@ class CollectionFormWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(GlobalKey<FormState>.new);
     final status = ref.watch(collectionFormProvider.select((s) => s.status));
+    final initialCollection = ref.watch(
+      collectionFormProvider.select((s) => s.initialCollection),
+    );
 
     ref.listen(collectionFormProvider, (previous, next) {
       if (previous?.status == next.status) return;
@@ -27,6 +32,17 @@ class CollectionFormWidget extends HookConsumerWidget {
         case CollectionFormStatus.failure:
           context.showErrorSnackBar(next.exception?.message);
         case CollectionFormStatus.success:
+          final newOrUpdatedCollection = next.newCollection;
+          if (initialCollection != null && newOrUpdatedCollection != null) {
+            // Optimistically update the current collection
+            final uid = initialCollection.uid;
+            final notifier = ref.read(collectionNotifierProvider(uid).notifier);
+            notifier.optimisticallyUpdate(newOrUpdatedCollection);
+
+            // Optimistically update the collections list
+            final colsNotifier = ref.read(allCollectionsProvider.notifier);
+            colsNotifier.optimisticallyUpdate(newOrUpdatedCollection);
+          }
           Navigator.pop(context);
       }
     });

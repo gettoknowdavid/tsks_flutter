@@ -38,7 +38,9 @@ class CollectionFormWidget extends HookConsumerWidget {
             final uid = initialCollection.uid;
             final notifier = ref.read(collectionNotifierProvider(uid).notifier);
             notifier.optimisticallyUpdate(newOrUpdatedCollection);
+          }
 
+          if (initialCollection == null && newOrUpdatedCollection != null) {
             // Optimistically update the collections list
             final colsNotifier = ref.read(allCollectionsProvider.notifier);
             colsNotifier.optimisticallyUpdate(newOrUpdatedCollection);
@@ -47,36 +49,41 @@ class CollectionFormWidget extends HookConsumerWidget {
       }
     });
 
-    return Form(
-      key: formKey,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
-        child: Column(
-          children: [
-            const Row(
-              spacing: 8,
-              children: [
-                _IconPickerField(key: Key('collectionForm_iconField')),
-                Expanded(
-                  child: _TitleField(key: Key('collectionForm_titleField')),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            const _ColorPickerField(key: Key('collectionForm_colorField')),
-            const SizedBox(height: 16),
-            const _IsFavouriteField(key: Key('collectionForm_isFavField')),
-            const SizedBox(height: 32),
-            Row(
-              spacing: 16,
-              children: [
-                const _SubmitButton(
-                  key: Key('collectionForm_submitButton'),
-                ),
-                CancelButton(enabled: !status.isLoading),
-              ],
-            ),
-          ],
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) ref.invalidate(collectionFormProvider);
+      },
+      child: Form(
+        key: formKey,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
+          child: Column(
+            children: [
+              const Row(
+                spacing: 8,
+                children: [
+                  _IconPickerField(key: Key('collectionForm_iconField')),
+                  Expanded(
+                    child: _TitleField(key: Key('collectionForm_titleField')),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              const _ColorPickerField(key: Key('collectionForm_colorField')),
+              const SizedBox(height: 16),
+              const _IsFavouriteField(key: Key('collectionForm_isFavField')),
+              const SizedBox(height: 32),
+              Row(
+                spacing: 16,
+                children: [
+                  const _SubmitButton(
+                    key: Key('collectionForm_submitButton'),
+                  ),
+                  CancelButton(enabled: !status.isLoading),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

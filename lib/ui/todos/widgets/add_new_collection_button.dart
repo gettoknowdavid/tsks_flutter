@@ -31,10 +31,13 @@ class AddNewCollectionButton extends ConsumerWidget {
           showDialog<void>(
             context: context,
             barrierDismissible: !status.isLoading,
-            builder: (context) => const Dialog(
-              alignment: Alignment.topCenter,
-              insetPadding: EdgeInsets.fromLTRB(40, 160, 40, 0),
-              child: CollectionFormWidget(),
+            builder: (context) => const MaxWidthBox(
+              maxWidth: 560,
+              child: Dialog(
+                alignment: Alignment.topCenter,
+                insetPadding: EdgeInsets.fromLTRB(40, 160, 40, 0),
+                child: CollectionFormWidget(),
+              ),
             ),
           );
         }

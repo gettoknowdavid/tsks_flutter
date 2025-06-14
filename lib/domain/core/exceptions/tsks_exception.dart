@@ -32,3 +32,7 @@ final class TsksTimeoutException extends TsksException {
     super.message = 'The operation timed out. Please try again.',
   ]);
 }
+
+final class TsksUnknownException extends TsksException {
+  const TsksUnknownException([super.message = 'Unknown exception']);
+}

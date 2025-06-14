@@ -2,15 +2,14 @@ import 'package:equatable/equatable.dart';
 import 'package:tsks_flutter/domain/core/value_objects/value_objects.dart';
 import 'package:tsks_flutter/domain/models/todos/collection.dart';
 
-
 final class CollectionDto with EquatableMixin {
   const CollectionDto({
     required this.uid,
     required this.title,
+    required this.createdAt,
     this.isFavourite = false,
     this.colorARGB,
     this.iconMap,
-    this.createdAt,
   });
 
   factory CollectionDto.fromFirestore(String uid, Map<String, dynamic> json) {
@@ -20,9 +19,7 @@ final class CollectionDto with EquatableMixin {
       isFavourite: json['isFavourite'] as bool? ?? false,
       colorARGB: (json['colorARGB'] as num?)?.toInt(),
       iconMap: json['iconMap'] as Map<String, dynamic>?,
-      createdAt: json['createdAt'] == null
-          ? null
-          : DateTime.parse(json['createdAt'] as String),
+      createdAt: DateTime.parse(json['createdAt'] as String),
     );
   }
 
@@ -42,7 +39,7 @@ final class CollectionDto with EquatableMixin {
   final bool isFavourite;
   final int? colorARGB;
   final Map<String, dynamic>? iconMap;
-  final DateTime? createdAt;
+  final DateTime createdAt;
 
   @override
   List<Object?> get props => [
@@ -59,7 +56,7 @@ final class CollectionDto with EquatableMixin {
     'isFavourite': isFavourite,
     'colorARGB': colorARGB,
     'iconMap': iconMap,
-    'createdAt': createdAt?.toIso8601String(),
+    'createdAt': createdAt.toIso8601String(),
   };
 
   Collection toDomain() {

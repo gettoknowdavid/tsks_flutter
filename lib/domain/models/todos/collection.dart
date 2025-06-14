@@ -5,10 +5,10 @@ final class Collection with EquatableMixin {
   const Collection({
     required this.uid,
     required this.title,
+    required this.createdAt,
     this.isFavourite = false,
     this.colorARGB,
     this.iconMap,
-    this.createdAt,
   });
 
   final Uid uid;
@@ -16,11 +16,12 @@ final class Collection with EquatableMixin {
   final bool isFavourite;
   final int? colorARGB;
   final Map<String, dynamic>? iconMap;
-  final DateTime? createdAt;
+  final DateTime createdAt;
 
   static Collection empty = Collection(
     uid: Uid(''),
     title: SingleLineString(''),
+    createdAt: DateTime.now(),
   );
 
   @override

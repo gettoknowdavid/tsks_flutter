@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:responsive_framework/responsive_framework.dart';
+import 'package:tsks_flutter/routing/router_notifier.dart';
 
 class PageWidget extends StatelessWidget {
   const PageWidget({
@@ -83,7 +84,7 @@ class PageAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: showBackButton
           ? PageBackButton(onBackPressed: onBackPressed)
           : null,
-      title: PageTitle(title: title),
+      title: PageTitle(title),
       titleSpacing: showBackButton ? 0 : null,
       centerTitle: false,
       actions: [action, const SizedBox(width: 16)],
@@ -116,7 +117,7 @@ class PageHeaderWidget extends StatelessWidget {
           PageBackButton(onBackPressed: onBackPressed),
           const SizedBox(width: 16),
         ],
-        PageTitle(title: title),
+        PageTitle(title),
         const Spacer(),
         action,
       ],
@@ -125,7 +126,8 @@ class PageHeaderWidget extends StatelessWidget {
 }
 
 class PageTitle extends StatelessWidget {
-  const PageTitle({required this.title, super.key});
+  const PageTitle(this.title, {super.key});
+
   final String title;
 
   @override
@@ -159,7 +161,8 @@ class PageTitle extends StatelessWidget {
 // }
 
 class PageBackButton extends StatelessWidget {
-  const PageBackButton({required this.onBackPressed, super.key});
+  const PageBackButton({this.onBackPressed, super.key});
+
   final VoidCallback? onBackPressed;
 
   @override
@@ -167,15 +170,17 @@ class PageBackButton extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final canPop = Navigator.canPop(context);
 
-    if (!canPop) return const SizedBox.shrink();
-
     return Center(
       child: SizedBox.square(
         dimension: 30,
         child: IconButton.filled(
           onPressed: () {
             if (onBackPressed != null) return onBackPressed?.call();
-            if (canPop) return Navigator.pop(context);
+            if (canPop) {
+              return Navigator.pop(context);
+            } else {
+              const CollectionsRoute().push<void>(context);
+            }
           },
           style: IconButton.styleFrom(
             padding: const EdgeInsets.all(2),

@@ -13,6 +13,12 @@ abstract final class TsksTheme {
     final baseTheme = ThemeData(
       brightness: colorScheme.brightness,
       colorScheme: colorScheme,
+      popupMenuTheme: const PopupMenuThemeData(
+        position: PopupMenuPosition.under,
+        shape: RoundedSuperellipseBorder(
+          borderRadius: BorderRadiusGeometry.all(Radius.circular(12)),
+        ),
+      ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 32),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:tsks_flutter/domain/core/value_objects/uid.dart';
 import 'package:tsks_flutter/domain/models/auth/user.dart';
 import 'package:tsks_flutter/ui/auth/pages/pages.dart';
 import 'package:tsks_flutter/ui/auth/providers/auth_repository_provider.dart';
@@ -193,7 +194,7 @@ final class CollectionRoute extends GoRouteData with _$CollectionRoute {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return const CollectionPage();
+    return CollectionPage(uid: Uid(uid));
   }
 }
 

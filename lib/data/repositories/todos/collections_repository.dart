@@ -53,6 +53,22 @@ final class CollectionsRepository {
     }
   }
 
+  Future<Either<TsksException, Unit>> updateCollection({
+    required Uid uid,
+    required Map<String, dynamic> data,
+  }) async {
+    if (data.isEmpty) return const Left(NoCollectionFoundException());
+
+    try {
+      await _collectionRef.doc(uid.getOrCrash).update(data);
+      return const Right(unit);
+    } on TimeoutException {
+      return const Left(TsksTimeoutException());
+    } on Exception catch (e) {
+      return Left(TsksException(e.toString()));
+    }
+  }
+
   Future<Either<TsksException, List<Collection?>>> getCollections() async {
     try {
       final querySnapshot = await _collectionRef.collectionConverter
@@ -64,6 +80,20 @@ final class CollectionsRepository {
           .toList();
 
       return Right(collections);
+    } on TimeoutException {
+      return const Left(TsksTimeoutException());
+    } on Exception catch (e) {
+      return Left(TsksException(e.toString()));
+    }
+  }
+
+  Future<Either<TsksException, Collection>> getCollection(Uid uid) async {
+    try {
+      final uidStr = uid.getOrCrash;
+      final doc = await _collectionRef.collectionConverter.doc(uidStr).get();
+      final collection = doc.data()?.toDomain();
+      if (collection == null) return const Left(NoCollectionFoundException());
+      return Right(collection);
     } on TimeoutException {
       return const Left(TsksTimeoutException());
     } on Exception catch (e) {

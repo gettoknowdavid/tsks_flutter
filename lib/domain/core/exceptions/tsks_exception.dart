@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 
 final class TsksException with EquatableMixin implements Exception {
   const TsksException(this.message);
+
   final String message;
 
   @override
@@ -35,4 +36,8 @@ final class TsksTimeoutException extends TsksException {
 
 final class TsksUnknownException extends TsksException {
   const TsksUnknownException([super.message = 'Unknown exception']);
+}
+
+final class NoCollectionFoundException extends TsksException {
+  const NoCollectionFoundException([super.message = 'No collection found']);
 }

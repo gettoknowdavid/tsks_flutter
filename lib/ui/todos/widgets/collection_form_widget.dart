@@ -12,6 +12,7 @@ import 'package:tsks_flutter/utils/my_custom_icons.dart';
 
 class CollectionFormWidget extends HookConsumerWidget {
   const CollectionFormWidget({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(GlobalKey<FormState>.new);
@@ -68,6 +69,7 @@ class CollectionFormWidget extends HookConsumerWidget {
 
 class _TitleField extends HookConsumerWidget {
   const _TitleField({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).colorScheme;
@@ -79,6 +81,7 @@ class _TitleField extends HookConsumerWidget {
         fillColor: colors.surfaceContainer,
         filled: true,
       ),
+      initialValue: title.getOrNull,
       onChanged: ref.read(collectionFormProvider.notifier).titleChanged,
       validator: (value) => title.failureOrNull?.message,
       enabled: !status.isLoading,
@@ -214,6 +217,16 @@ class _SubmitButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final status = ref.watch(collectionFormProvider.select((s) => s.status));
 
+    // Whether the form is in editing mode i.e. editing an existing collection
+    final isEditing = ref.watch(
+      collectionFormProvider.select((s) => s.isEditing),
+    );
+
+    // Whether the form state during when editing a collection has any changes
+    final hasChanges = ref.watch(
+      collectionFormProvider.select((s) => s.hasChanges),
+    );
+
     Future<void> submit() async {
       if (!Form.of(context).validate()) return;
       await ref.watch(collectionFormProvider.notifier).submit();
@@ -223,10 +236,10 @@ class _SubmitButton extends ConsumerWidget {
       height: 52,
       child: FilledButton(
         style: FilledButton.styleFrom(),
-        onPressed: status.isLoading ? null : submit,
+        onPressed: status.isLoading || !hasChanges ? null : submit,
         child: status.isLoading
             ? const Text('Submitting...')
-            : const Text('Add Collection'),
+            : Text(isEditing ? 'Update Collection' : 'Add Collection'),
       ),
     );
   }

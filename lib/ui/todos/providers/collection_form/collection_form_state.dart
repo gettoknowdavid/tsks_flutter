@@ -16,6 +16,7 @@ final class CollectionFormState with EquatableMixin {
     this.iconMap,
     this.status = CollectionFormStatus.initial,
     this.exception,
+    this.initialCollection,
   });
 
   final SingleLineString title;
@@ -25,6 +26,7 @@ final class CollectionFormState with EquatableMixin {
   final DateTime createdAt;
   final CollectionFormStatus status;
   final TsksException? exception;
+  final Collection? initialCollection;
 
   CollectionFormState withTitle(String title) {
     return CollectionFormState._(
@@ -33,6 +35,7 @@ final class CollectionFormState with EquatableMixin {
       iconMap: iconMap,
       isFavourite: isFavourite,
       createdAt: createdAt,
+      initialCollection: initialCollection,
     );
   }
 
@@ -43,6 +46,7 @@ final class CollectionFormState with EquatableMixin {
       iconMap: iconMap,
       isFavourite: isFavouriteValue ?? isFavourite,
       createdAt: createdAt,
+      initialCollection: initialCollection,
     );
   }
 
@@ -53,6 +57,7 @@ final class CollectionFormState with EquatableMixin {
       iconMap: iconMap,
       isFavourite: isFavourite,
       createdAt: createdAt,
+      initialCollection: initialCollection,
     );
   }
 
@@ -63,6 +68,18 @@ final class CollectionFormState with EquatableMixin {
       iconMap: iconMapValue,
       isFavourite: isFavourite,
       createdAt: createdAt,
+      initialCollection: initialCollection,
+    );
+  }
+
+  CollectionFormState withCollection(Collection collection) {
+    return CollectionFormState._(
+      title: collection.title,
+      isFavourite: collection.isFavourite,
+      createdAt: collection.createdAt,
+      color: collection.colorARGB?.toColor,
+      iconMap: collection.iconMap,
+      initialCollection: collection,
     );
   }
 
@@ -73,6 +90,7 @@ final class CollectionFormState with EquatableMixin {
       iconMap: iconMap,
       isFavourite: isFavourite,
       createdAt: createdAt,
+      initialCollection: initialCollection,
       status: CollectionFormStatus.loading,
     );
   }
@@ -84,6 +102,7 @@ final class CollectionFormState with EquatableMixin {
       iconMap: iconMap,
       isFavourite: isFavourite,
       createdAt: createdAt,
+      initialCollection: initialCollection,
       status: CollectionFormStatus.failure,
       exception: exception,
     );
@@ -96,11 +115,30 @@ final class CollectionFormState with EquatableMixin {
       iconMap: iconMap,
       isFavourite: isFavourite,
       createdAt: createdAt,
+      initialCollection: initialCollection,
       status: CollectionFormStatus.success,
     );
   }
 
   bool get isFormValid => title.isValid;
+
+  bool get isEditing => initialCollection != null;
+
+  bool get hasChanges {
+    return initialCollection?.title != title ||
+        initialCollection?.iconMap != iconMap ||
+        initialCollection?.colorARGB != color?.toARGB32() ||
+        initialCollection?.isFavourite != isFavourite;
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'title': title.getOrCrash,
+      'isFavourite': isFavourite,
+      'colorARGB': color?.toARGB32(),
+      'iconMap': iconMap,
+    };
+  }
 
   @override
   List<Object?> get props => [
@@ -111,6 +149,7 @@ final class CollectionFormState with EquatableMixin {
     createdAt,
     status,
     exception,
+    initialCollection,
   ];
 }
 
@@ -118,8 +157,11 @@ enum CollectionFormStatus { initial, loading, success, failure }
 
 extension CollectionFormStatusX on CollectionFormStatus {
   bool get isInitial => this == CollectionFormStatus.initial;
+
   bool get isLoading => this == CollectionFormStatus.loading;
+
   bool get isSuccess => this == CollectionFormStatus.success;
+
   bool get isFailure => this == CollectionFormStatus.failure;
 }
 

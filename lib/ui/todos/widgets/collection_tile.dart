@@ -3,12 +3,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:tsks_flutter/domain/models/todos/collection.dart';
 import 'package:tsks_flutter/routing/router_notifier.dart';
-import 'package:tsks_flutter/ui/todos/providers/collection/collection_notifier.dart';
 import 'package:tsks_flutter/ui/todos/widgets/collection_icon_widget.dart';
 import 'package:tsks_flutter/ui/todos/widgets/collection_tasks_status_widget.dart';
 
 class CollectionTile extends ConsumerWidget {
   const CollectionTile({required this.collection, super.key});
+
   final Collection collection;
 
   @override
@@ -18,7 +18,6 @@ class CollectionTile extends ConsumerWidget {
 
     return InkWell(
       onTap: () {
-        ref.read(collectionNotifierProvider.notifier).fetch(collection);
         CollectionRoute(collection.uid.getOrCrash).push<void>(context);
       },
       borderRadius: const BorderRadius.all(Radius.circular(28)),

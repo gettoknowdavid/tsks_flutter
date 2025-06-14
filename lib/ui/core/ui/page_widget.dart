@@ -7,16 +7,16 @@ class PageWidget extends StatelessWidget {
     required this.title,
     super.key,
     this.showBackButton = false,
-    this.onMoreTap,
     this.onBackPressed,
     this.content = const SizedBox.shrink(),
+    this.action = const SizedBox.shrink(),
   });
 
   final String title;
   final bool showBackButton;
-  final VoidCallback? onMoreTap;
   final VoidCallback? onBackPressed;
   final Widget content;
+  final Widget action;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,7 @@ class PageWidget extends StatelessWidget {
               showBackButton: showBackButton,
               onBackPressed: onBackPressed,
               title: title,
-              onMoreTap: onMoreTap,
+              action: action,
             )
           : null,
       body: SingleChildScrollView(
@@ -50,7 +50,7 @@ class PageWidget extends StatelessWidget {
                 PageHeaderWidget(
                   title: title,
                   showBackButton: showBackButton,
-                  onMoreTap: onMoreTap,
+                  action: action,
                   onBackPressed: onBackPressed,
                 ),
               ],
@@ -68,14 +68,14 @@ class PageAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.showBackButton,
     required this.onBackPressed,
     required this.title,
-    required this.onMoreTap,
+    required this.action,
     super.key,
   });
 
   final bool showBackButton;
   final VoidCallback? onBackPressed;
   final String title;
-  final VoidCallback? onMoreTap;
+  final Widget action;
 
   @override
   Widget build(BuildContext context) {
@@ -86,10 +86,7 @@ class PageAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: PageTitle(title: title),
       titleSpacing: showBackButton ? 0 : null,
       centerTitle: false,
-      actions: [
-        PageMoreOptions(onMoreTap: onMoreTap),
-        const SizedBox(width: 16),
-      ],
+      actions: [action, const SizedBox(width: 16)],
     );
   }
 
@@ -101,14 +98,14 @@ class PageHeaderWidget extends StatelessWidget {
   const PageHeaderWidget({
     required this.title,
     this.showBackButton = false,
-    this.onMoreTap,
+    this.action = const SizedBox.shrink(),
     this.onBackPressed,
     super.key,
   });
 
   final String title;
   final bool showBackButton;
-  final VoidCallback? onMoreTap;
+  final Widget action;
   final VoidCallback? onBackPressed;
 
   @override
@@ -121,7 +118,7 @@ class PageHeaderWidget extends StatelessWidget {
         ],
         PageTitle(title: title),
         const Spacer(),
-        PageMoreOptions(onMoreTap: onMoreTap),
+        action,
       ],
     );
   }
@@ -138,28 +135,28 @@ class PageTitle extends StatelessWidget {
   }
 }
 
-class PageMoreOptions extends StatelessWidget {
-  const PageMoreOptions({required this.onMoreTap, super.key});
-  final VoidCallback? onMoreTap;
+// class PageMoreOptions extends StatelessWidget {
+//   const PageMoreOptions({required this.onMoreTap, super.key});
+//   final VoidCallback? onMoreTap;
 
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox.square(
-      dimension: 30,
-      child: IconButton(
-        onPressed: onMoreTap,
-        style: IconButton.styleFrom(
-          padding: const EdgeInsets.all(2),
-          shape: const RoundedSuperellipseBorder(
-            borderRadius: BorderRadiusGeometry.all(Radius.circular(10)),
-          ),
-        ),
-        iconSize: 20,
-        icon: const Icon(PhosphorIconsBold.dotsThree),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return SizedBox.square(
+//       dimension: 30,
+//       child: IconButton(
+//         onPressed: onMoreTap,
+//         style: IconButton.styleFrom(
+//           padding: const EdgeInsets.all(2),
+//           shape: const RoundedSuperellipseBorder(
+//             borderRadius: BorderRadiusGeometry.all(Radius.circular(10)),
+//           ),
+//         ),
+//         iconSize: 20,
+//         icon: const Icon(PhosphorIconsBold.dotsThree),
+//       ),
+//     );
+//   }
+// }
 
 class PageBackButton extends StatelessWidget {
   const PageBackButton({required this.onBackPressed, super.key});

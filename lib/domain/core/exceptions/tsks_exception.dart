@@ -41,3 +41,7 @@ final class TsksUnknownException extends TsksException {
 final class NoCollectionFoundException extends TsksException {
   const NoCollectionFoundException([super.message = 'No collection found']);
 }
+
+final class NoTodoFoundException extends TsksException {
+  const NoTodoFoundException([super.message = 'No todo found']);
+}

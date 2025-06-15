@@ -87,6 +87,17 @@ final class CollectionsRepository {
     }
   }
 
+  Future<Either<TsksException, Uid>> deleteCollection(Uid uid) async {
+    try {
+      await _collectionRef.doc(uid.getOrCrash).delete();
+      return Right(uid);
+    } on TimeoutException {
+      return const Left(TsksTimeoutException());
+    } on Exception catch (e) {
+      return Left(TsksException(e.toString()));
+    }
+  }
+
   Future<Either<TsksException, List<Collection?>>> getCollections() async {
     try {
       final querySnapshot = await _collectionRef.collectionConverter

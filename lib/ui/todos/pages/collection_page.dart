@@ -99,14 +99,45 @@ class _MoreOptions extends ConsumerWidget {
     final collection = ref.watch(collectionNotifierProvider(uid)).valueOrNull;
     return PopupMenuButton<String>(
       child: const Icon(PhosphorIconsBold.dotsThree),
-      onSelected: (String value) {
+      onSelected: (String value) async {
+        if (collection == null) return;
         if (value == 'Edit') {
-          if (collection != null) {
-            final notifier = ref.read(collectionFormProvider.notifier);
-            notifier.initializeWithCollection(collection);
-            context.openCollectionEditor();
+          final notifier = ref.read(collectionFormProvider.notifier);
+          notifier.initializeWithCollection(collection);
+          context.openCollectionEditor();
+        } else if (value == 'Delete') {
+          final shouldDelete = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Delete Collection?'),
+              content: const Text(
+                '''You are about to delete this collection. This aaction cannot be undone. Do you want to continue?''',
+              ),
+              actions: [
+                FilledButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text('Delete'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('Cancel'),
+                ),
+              ],
+            ),
+          );
+
+          if (shouldDelete ?? false) {
+            final uid = collection.uid;
+            final notifier = ref.read(collectionNotifierProvider(uid).notifier);
+            await notifier.deleteCollection();
+            if (context.mounted) {
+              await const CollectionsRoute().push<void>(context);
+            } else {
+              final location = const CollectionsRoute().location;
+              await ref.read(routerConfigProvider).push<void>(location);
+            }
           }
-        } else if (value == 'Delete') {}
+        }
       },
       itemBuilder: (BuildContext context) {
         return ['Edit', 'Delete'].map((String choice) {

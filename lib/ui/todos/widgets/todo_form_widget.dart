@@ -6,8 +6,10 @@ import 'package:tsks_flutter/domain/core/value_objects/uid.dart';
 import 'package:tsks_flutter/domain/models/todos/collection.dart';
 import 'package:tsks_flutter/routing/router_notifier.dart';
 import 'package:tsks_flutter/ui/core/ui/cancel_button.dart';
+import 'package:tsks_flutter/ui/core/ui/tsks_snackbar.dart';
 import 'package:tsks_flutter/ui/todos/providers/collections/collections_provider.dart';
 import 'package:tsks_flutter/ui/todos/providers/todo_form/todo_form_notifier.dart';
+import 'package:tsks_flutter/ui/todos/providers/todos_provider.dart';
 import 'package:tsks_flutter/ui/todos/widgets/date_form_field.dart';
 
 class TodoFormWidget extends HookConsumerWidget {
@@ -17,6 +19,26 @@ class TodoFormWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(GlobalKey<FormState>.new);
     final status = ref.watch(todoFormProvider.select((s) => s.status));
+
+    ref.listen(todoFormProvider, (previous, next) {
+      if (previous?.status == next.status) return;
+      switch (next.status) {
+        case TodoFormStatus.initial:
+        case TodoFormStatus.loading:
+          return;
+        case TodoFormStatus.failure:
+          context.showErrorSnackBar(next.exception?.message);
+          return;
+        case TodoFormStatus.success:
+          final newOrUpdatedTodo = next.newTodo;
+          if (newOrUpdatedTodo != null) {
+            // Optimistically update the collections list
+            final notifier = ref.read(todosProvider.notifier);
+            notifier.optimisticallyUpdate(newOrUpdatedTodo);
+          }
+          Navigator.pop(context);
+      }
+    });
 
     return PopScope(
       onPopInvokedWithResult: (didPop, result) {

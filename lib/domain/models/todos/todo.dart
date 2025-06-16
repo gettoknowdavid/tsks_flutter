@@ -27,6 +27,26 @@ final class Todo with EquatableMixin {
   final DateTime createdAt;
   final DateTime? updatedAt;
 
+  Todo copyWith({
+    Uid? uid,
+    Uid? collectionUid,
+    SingleLineString? title,
+    bool? isDone,
+    DateTime? dueDate,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return Todo(
+      uid: uid ?? this.uid,
+      collectionUid: collectionUid ?? this.collectionUid,
+      title: title ?? this.title,
+      isDone: isDone ?? this.isDone,
+      dueDate: dueDate ?? this.dueDate,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
   @override
   List<Object?> get props => [
     uid,

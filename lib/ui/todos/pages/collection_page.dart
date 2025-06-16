@@ -9,6 +9,7 @@ import 'package:tsks_flutter/ui/core/ui/page_widget.dart';
 import 'package:tsks_flutter/ui/todos/providers/collection_form/collection_form.dart';
 import 'package:tsks_flutter/ui/todos/providers/collection_notifier.dart';
 import 'package:tsks_flutter/ui/todos/widgets/todo_extensions.dart';
+import 'package:tsks_flutter/ui/todos/widgets/todo_list_widget.dart';
 
 class CollectionPage extends ConsumerWidget {
   const CollectionPage({required this.uid, super.key});
@@ -46,6 +47,8 @@ class CollectionPage extends ConsumerWidget {
                   ],
                 ),
               ],
+              const SizedBox(height: 40),
+              const TodoListWidget(),
             ],
           ),
         ),

@@ -64,6 +64,19 @@ final class TodosRepository {
     }
   }
 
+  Future<Either<TsksException, Unit>> markTodo(Todo todo) async {
+    try {
+      await _todoReference(
+        todo.collectionUid,
+      ).doc(todo.uid.getOrCrash).update({'isDone': todo.isDone});
+      return const Right(unit);
+    } on TimeoutException {
+      return const Left(TsksTimeoutException());
+    } on Exception catch (e) {
+      return Left(TsksException(e.toString()));
+    }
+  }
+
   Future<Either<TsksException, List<Todo?>>> getTodos(
     Uid collectionUid,
   ) async {

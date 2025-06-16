@@ -15,6 +15,25 @@ abstract final class TsksTheme {
     final baseTheme = ThemeData(
       brightness: colorScheme.brightness,
       colorScheme: colorScheme,
+      cardTheme: CardThemeData(
+        shape: const RoundedSuperellipseBorder(
+          borderRadius: BorderRadiusGeometry.all(Radius.circular(18)),
+        ),
+        color: colorScheme.surfaceContainerHigh,
+        margin: EdgeInsets.zero,
+        elevation: 0,
+      ),
+      checkboxTheme: CheckboxThemeData(
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(7)),
+        ),
+        checkColor: WidgetStatePropertyAll(colorScheme.surface),
+        fillColor: WidgetStateColor.resolveWith((states) {
+          if (!states.contains(WidgetState.selected)) return Colors.transparent;
+          return colorScheme.secondary;
+        }),
+        side: BorderSide(width: 2, color: colorScheme.secondary),
+      ),
       dropdownMenuTheme: DropdownMenuThemeData(
         inputDecorationTheme: InputDecorationTheme(
           filled: true,

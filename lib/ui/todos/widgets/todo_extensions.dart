@@ -61,4 +61,29 @@ extension TodoExtensions on BuildContext {
       );
     }
   }
+
+  Future<bool?> deleteTodoConfirmationDialog() async {
+    return showDialog<bool>(
+      context: this,
+      builder: (context) => MaxWidthBox(
+        maxWidth: 560,
+        child: AlertDialog(
+          title: const Text('Delete Todo?'),
+          content: const Text(
+            '''You are about to delete this todo. This aaction cannot be undone. Do you want to continue?''',
+          ),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Delete'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

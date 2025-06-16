@@ -171,26 +171,7 @@ class _TodoOptions extends ConsumerWidget {
         }
 
         if (value == 'Delete' && context.mounted) {
-          final shouldDelete = await showDialog<bool>(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Delete Todo?'),
-              content: const Text(
-                '''You are about to delete this todo. This aaction cannot be undone. Do you want to continue?''',
-              ),
-              actions: [
-                FilledButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  child: const Text('Delete'),
-                ),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Cancel'),
-                ),
-              ],
-            ),
-          );
-
+          final shouldDelete = await context.deleteTodoConfirmationDialog();
           if (shouldDelete ?? false) {
             final collectionUid = todo.collectionUid;
             final notifier = ref.read(todosProvider(collectionUid).notifier);

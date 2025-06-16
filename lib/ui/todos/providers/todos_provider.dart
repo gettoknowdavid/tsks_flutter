@@ -22,14 +22,18 @@ class Todos extends _$Todos {
   }
 
   void optimisticallyUpdate(Todo todo) {
-    state.whenData((data) {
-      final todos = [...data];
-      final index = todos.indexWhere((t) => todo.uid == t?.uid);
-      if (index == -1) {
-        state = AsyncData([todo, ...todos]);
+    state.whenData((todos) {
+      if (todos.isEmpty) {
+        state = AsyncData([todo]);
       } else {
-        todos[index] = todo;
-        state = AsyncData(todos);
+        final index = todos.indexWhere((t) => todo.uid == t?.uid);
+        if (index == -1) {
+          state = AsyncData([todo, ...todos]);
+        } else {
+          final currentTodos = [...todos];
+          currentTodos[index] = todo;
+          state = AsyncData(currentTodos);
+        }
       }
     });
   }

@@ -119,7 +119,7 @@ final class TodoFormState with EquatableMixin {
       dueDate: dueDate,
       initialTodo: initialTodo,
       status: TodoFormStatus.success,
-      newTodo: newTodo,
+      newTodo: todo,
     );
   }
 

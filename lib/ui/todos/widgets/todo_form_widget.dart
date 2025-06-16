@@ -33,7 +33,8 @@ class TodoFormWidget extends HookConsumerWidget {
           final newOrUpdatedTodo = next.newTodo;
           if (newOrUpdatedTodo != null) {
             // Optimistically update the collections list
-            final notifier = ref.read(todosProvider.notifier);
+            final collectionUid = newOrUpdatedTodo.collectionUid;
+            final notifier = ref.read(todosProvider(collectionUid).notifier);
             notifier.optimisticallyUpdate(newOrUpdatedTodo);
           }
           Navigator.pop(context);

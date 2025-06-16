@@ -3,19 +3,14 @@ import 'package:tsks_flutter/data/repositories/todos/todos_repository.dart';
 import 'package:tsks_flutter/domain/core/exceptions/exceptions.dart';
 import 'package:tsks_flutter/domain/core/value_objects/uid.dart';
 import 'package:tsks_flutter/domain/models/todos/todo.dart';
-import 'package:tsks_flutter/routing/router_notifier.dart';
 
 part 'todos_provider.g.dart';
 
 @riverpod
 class Todos extends _$Todos {
   @override
-  FutureOr<List<Todo?>> build() async {
-    final router = ref.watch(routerConfigProvider);
-    final uidString = router.state.pathParameters['uid'];
-    final collectionUid = uidString != null ? Uid(uidString) : null;
+  FutureOr<List<Todo?>> build(Uid? collectionUid) async {
     if (collectionUid == null) throw const TsksException('Collection needed');
-
     final repository = ref.read(todosRepositoryProvider);
     final response = await repository.getTodos(collectionUid);
     return response.fold((exception) => throw exception, (todos) => todos);

@@ -5,6 +5,7 @@ import 'package:tsks_flutter/constants/fake_models.dart';
 import 'package:tsks_flutter/domain/core/exceptions/exceptions.dart';
 import 'package:tsks_flutter/domain/core/value_objects/uid.dart';
 import 'package:tsks_flutter/domain/models/todos/todo.dart';
+import 'package:tsks_flutter/routing/router_notifier.dart';
 import 'package:tsks_flutter/ui/todos/providers/todos_provider.dart';
 import 'package:tsks_flutter/ui/todos/widgets/todo_tile.dart';
 
@@ -13,7 +14,10 @@ class TodoListWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final todos = ref.watch(todosProvider);
+    final router = ref.watch(routerConfigProvider);
+    final uidString = router.state.pathParameters['uid'];
+    final collectionUid = uidString != null ? Uid(uidString) : null;
+    final todos = ref.watch(todosProvider(collectionUid));
     return switch (todos) {
       AsyncLoading() => _TodoList(fakeTodos, isLoading: true),
       AsyncData(:final value) => _TodoList(value),

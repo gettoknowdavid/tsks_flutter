@@ -67,7 +67,7 @@ class _TodoCheckboxWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notifier = ref.read(todosProvider.notifier);
+    final notifier = ref.read(todosProvider(todo.collectionUid).notifier);
     return Skeleton.shade(
       child: Transform.scale(
         scale: 1.4,
@@ -192,7 +192,9 @@ class _TodoOptions extends ConsumerWidget {
           );
 
           if (shouldDelete ?? false) {
-            await ref.read(todosProvider.notifier).deleteTodo(todo);
+            final collectionUid = todo.collectionUid;
+            final notifier = ref.read(todosProvider(collectionUid).notifier);
+            await notifier.deleteTodo(todo);
           }
         }
       },

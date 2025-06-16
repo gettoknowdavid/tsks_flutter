@@ -8,12 +8,15 @@ import 'package:tsks_flutter/domain/models/todos/todo.dart';
 part 'todo_form_notifier.g.dart';
 part 'todo_form_state.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class TodoForm extends _$TodoForm {
   @override
   TodoFormState build() => TodoFormState();
 
-  void collectionChanged(Uid uid) => state = state.withCollectionUid(uid);
+  void collectionChanged(Uid? uid) {
+    if (uid == null) return;
+    state = state.withCollectionUid(uid);
+  }
 
   void titleChanged(String title) => state = state.withTitle(title);
 

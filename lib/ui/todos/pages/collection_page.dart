@@ -8,7 +8,7 @@ import 'package:tsks_flutter/routing/router_notifier.dart';
 import 'package:tsks_flutter/ui/core/ui/page_widget.dart';
 import 'package:tsks_flutter/ui/todos/providers/collection_form/collection_form.dart';
 import 'package:tsks_flutter/ui/todos/providers/collection_notifier.dart';
-import 'package:tsks_flutter/ui/todos/widgets/add_new_collection_button.dart';
+import 'package:tsks_flutter/ui/todos/widgets/todo_extensions.dart';
 
 class CollectionPage extends ConsumerWidget {
   const CollectionPage({required this.uid, super.key});
@@ -104,7 +104,7 @@ class _MoreOptions extends ConsumerWidget {
         if (value == 'Edit') {
           final notifier = ref.read(collectionFormProvider.notifier);
           notifier.initializeWithCollection(collection);
-          context.openCollectionEditor();
+          await context.openCollectionEditor();
         } else if (value == 'Delete') {
           final shouldDelete = await showDialog<bool>(
             context: context,

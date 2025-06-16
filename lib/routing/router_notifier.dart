@@ -150,6 +150,7 @@ final class SignUpRoute extends GoRouteData with _$SignUpRoute {
 )
 final class TsksLayoutRoute extends StatefulShellRouteData {
   const TsksLayoutRoute();
+
   static final GlobalKey<NavigatorState> $navigatorKey = layoutKey;
 
   @override
@@ -190,6 +191,7 @@ final class CollectionsRoute extends GoRouteData with _$CollectionsRoute {
 
 final class CollectionRoute extends GoRouteData with _$CollectionRoute {
   const CollectionRoute(this.uid);
+
   final String uid;
 
   @override

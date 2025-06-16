@@ -22,6 +22,7 @@ final class TsksRouterState with EquatableMixin {
       '/search',
       '/notifications',
       '/me',
+      '/new-todo',
     ],
   );
 

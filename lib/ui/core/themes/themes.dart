@@ -4,15 +4,48 @@ import 'package:tsks_flutter/ui/core/themes/typography.dart';
 
 abstract final class TsksTheme {
   static ThemeData lightTheme = _rawTheme(TsksColors.lightColorScheme);
+
   // static ThemeData lightTheme = _rawTheme(const ColorScheme.light());
 
   static ThemeData darkTheme = _rawTheme(TsksColors.darkColorScheme);
+
   // static ThemeData darkTheme = _rawTheme(const ColorScheme.dark());
 
   static ThemeData _rawTheme(ColorScheme colorScheme) {
     final baseTheme = ThemeData(
       brightness: colorScheme.brightness,
       colorScheme: colorScheme,
+      dropdownMenuTheme: DropdownMenuThemeData(
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          contentPadding: const EdgeInsets.fromLTRB(22, 0, 22, 0),
+          fillColor: colorScheme.surfaceContainer,
+          border: OutlineInputBorder(
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
+            borderSide: BorderSide(width: 2, color: colorScheme.outlineVariant),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
+            borderSide: BorderSide(width: 3, color: colorScheme.primary),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
+            borderSide: BorderSide(width: 2, color: colorScheme.outlineVariant),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
+            borderSide: BorderSide(width: 2, color: colorScheme.error),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
+            borderSide: BorderSide(width: 3, color: colorScheme.error),
+          ),
+          disabledBorder: OutlineInputBorder(
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
+            borderSide: BorderSide(width: 2, color: colorScheme.outlineVariant),
+          ),
+        ),
+      ),
       popupMenuTheme: const PopupMenuThemeData(
         position: PopupMenuPosition.under,
         shape: RoundedSuperellipseBorder(

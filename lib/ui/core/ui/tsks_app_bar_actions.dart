@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:tsks_flutter/domain/core/value_objects/uid.dart';
 import 'package:tsks_flutter/routing/router_notifier.dart';
 import 'package:tsks_flutter/ui/core/ui/user_avatar.dart';
+import 'package:tsks_flutter/ui/todos/providers/todo_form/todo_form_notifier.dart';
+import 'package:tsks_flutter/ui/todos/widgets/todo_extensions.dart';
 
-class TsksAAppBarActions extends ConsumerWidget {
-  const TsksAAppBarActions({super.key});
+class TsksAppBarActions extends ConsumerWidget {
+  const TsksAppBarActions({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final router = ref.read(routerConfigProvider);
 
     return Row(
       spacing: 8,
@@ -19,7 +21,19 @@ class TsksAAppBarActions extends ConsumerWidget {
         SizedBox.square(
           dimension: 32,
           child: IconButton.filled(
-            onPressed: () {},
+            onPressed: () {
+              final collectionUidFromPath = ref
+                  .read(routerConfigProvider)
+                  .state
+                  .pathParameters['uid'];
+
+              if (collectionUidFromPath != null) {
+                final uid = Uid(collectionUidFromPath);
+                ref.read(todoFormProvider.notifier).collectionChanged(uid);
+              }
+
+              context.openTodoEditor();
+            },
             icon: const Icon(PhosphorIconsBold.plus),
             style: IconButton.styleFrom(
               iconSize: 16,
@@ -32,12 +46,12 @@ class TsksAAppBarActions extends ConsumerWidget {
         ),
         const SizedBox(width: 4),
         IconButton(
-          onPressed: () => router.go(const SearchRoute().location),
+          onPressed: () => const SearchRoute().go(context),
           iconSize: 18,
           icon: const Icon(PhosphorIconsBold.magnifyingGlass),
         ),
         IconButton(
-          onPressed: () => router.go(const NotificationsRoute().location),
+          onPressed: () => const NotificationsRoute().go(context),
           iconSize: 18,
           icon: const Icon(PhosphorIconsBold.bell),
         ),

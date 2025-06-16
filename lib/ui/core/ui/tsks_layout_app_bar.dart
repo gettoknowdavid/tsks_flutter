@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:responsive_framework/responsive_framework.dart';
-import 'package:tsks_flutter/ui/core/ui/tsks_a_app_bar_actions.dart';
+import 'package:tsks_flutter/ui/core/ui/tsks_app_bar_actions.dart';
 import 'package:tsks_flutter/ui/core/ui/tsks_app_bar_navigation_list.dart';
 
 class TsksLayoutAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -23,7 +23,7 @@ class TsksLayoutAppBar extends StatelessWidget implements PreferredSizeWidget {
         icon: const Icon(PhosphorIconsRegular.list),
       ),
       title: const TsksAppBarNavigationList(),
-      actions: const [TsksAAppBarActions()],
+      actions: const [TsksAppBarActions()],
     );
   }
 

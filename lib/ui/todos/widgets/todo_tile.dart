@@ -21,13 +21,26 @@ class TodoTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    Future<void> deleteTodo() async {
+      final collectionUid = todo.collectionUid;
+      final notifier = ref.read(todosProvider(collectionUid).notifier);
+      await notifier.deleteTodo(todo);
+    }
+
     return Dismissible(
       key: ValueKey<Uid>(todo.uid),
       background: const _DismissedContainer(),
       direction: DismissDirection.endToStart,
       onDismissed: (direction) => switch (direction) {
-        DismissDirection.endToStart => {},
+        DismissDirection.endToStart => deleteTodo(),
         _ => null,
+      },
+      confirmDismiss: (direction) async {
+        if (direction == DismissDirection.endToStart) {
+          return context.deleteTodoConfirmationDialog();
+        }
+
+        return null;
       },
       child: InkWell(
         borderRadius: const BorderRadius.all(Radius.circular(18)),

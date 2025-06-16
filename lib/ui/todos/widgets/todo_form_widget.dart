@@ -209,6 +209,7 @@ class _DateField extends HookConsumerWidget {
     return DateFormField(
       onChanged: notifier.dueDateChanged,
       enabled: !status.isLoading,
+      initialValue: ref.watch(todoFormProvider).dueDate,
     );
   }
 }

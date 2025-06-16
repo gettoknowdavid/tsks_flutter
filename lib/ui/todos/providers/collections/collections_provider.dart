@@ -24,11 +24,11 @@ class AllCollections extends _$AllCollections {
       if (collections.isEmpty) {
         state = AsyncData([collection]);
       } else {
-        final currentCollections = [...collections];
         final index = collections.indexWhere((c) => c?.uid == collection.uid);
         if (index == -1) {
           state = AsyncData([collection, ...collections]);
         } else {
+          final currentCollections = [...collections];
           currentCollections[index] = collection;
           state = AsyncData(currentCollections);
         }

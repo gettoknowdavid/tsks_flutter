@@ -77,6 +77,35 @@ final class TodosRepository {
     }
   }
 
+  Future<Either<TsksException, Todo>> updateTodo({
+    required Uid uid,
+    required Uid collectionUid,
+    required Map<String, dynamic> data,
+  }) async {
+    if (data.isEmpty) return const Left(NoTodoFoundException());
+
+    try {
+      final documentReference = _todoReference(
+        collectionUid,
+      ).doc(uid.getOrCrash);
+
+      await _todoReference(collectionUid).doc(uid.getOrCrash).update(data);
+
+      final snapshot = await documentReference.todoConverter.get();
+      final todoDto = snapshot.data();
+
+      if (todoDto == null) {
+        return const Left(TsksException('An error unknown occurred.'));
+      }
+
+      return Right(todoDto.toDomain());
+    } on TimeoutException {
+      return const Left(TsksTimeoutException());
+    } on Exception catch (e) {
+      return Left(TsksException(e.toString()));
+    }
+  }
+
   Future<Either<TsksException, List<Todo?>>> getTodos(
     Uid collectionUid,
   ) async {

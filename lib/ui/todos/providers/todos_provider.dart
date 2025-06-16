@@ -49,7 +49,35 @@ class Todos extends _$Todos {
       (exception) {
         // Revert the optimistic update
         optimisticallyUpdate(todo.copyWith(isDone: !todo.isDone));
-        throw exception;
+        return AsyncError(exception, StackTrace.current);
+      },
+      (_) => state,
+    );
+  }
+
+  Future<void> deleteTodo(Todo todo) async {
+    final todos = state.valueOrNull;
+    if (todos == null || todos.isEmpty) return;
+
+    final index = todos.indexWhere((t) => todo.uid == t?.uid);
+    if (index != -1) {
+      final updatedTodos = todos.where((t) => todo.uid != t?.uid).toList();
+      state = AsyncData(updatedTodos);
+    } else {
+      return;
+    }
+
+    final repository = ref.read(todosRepositoryProvider);
+    final response = await repository.deleteTodo(
+      todoUid: todo.uid,
+      collectionUid: todo.collectionUid,
+    );
+
+    state = response.fold(
+      (exception) {
+        // Revert the list by putting back the todo
+        optimisticallyUpdate(todo);
+        return AsyncError(exception, StackTrace.current);
       },
       (_) => state,
     );

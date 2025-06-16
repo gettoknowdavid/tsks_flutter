@@ -106,6 +106,20 @@ final class TodosRepository {
     }
   }
 
+  Future<Either<TsksException, Unit>> deleteTodo({
+    required Uid todoUid,
+    required Uid collectionUid,
+  }) async {
+    try {
+      await _todoReference(collectionUid).doc(todoUid.getOrCrash).delete();
+      return const Right(unit);
+    } on TimeoutException {
+      return const Left(TsksTimeoutException());
+    } on Exception catch (e) {
+      return Left(TsksException(e.toString()));
+    }
+  }
+
   Future<Either<TsksException, List<Todo?>>> getTodos(
     Uid collectionUid,
   ) async {

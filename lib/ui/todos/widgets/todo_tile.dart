@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:tsks_flutter/domain/core/value_objects/uid.dart';
 import 'package:tsks_flutter/domain/models/todos/todo.dart';
 import 'package:tsks_flutter/ui/todos/providers/todo_form/todo_form_notifier.dart';
@@ -46,6 +47,7 @@ class TodoTile extends ConsumerWidget {
                   children: [
                     _TodoCheckboxWidget(todo: todo),
                     Expanded(child: _TodoTitleWidget(todo: todo)),
+                    _TodoOptions(todo: todo),
                   ],
                 ),
                 _TodoSubtileWidget(todo: todo),
@@ -66,17 +68,19 @@ class _TodoCheckboxWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = ref.read(todosProvider.notifier);
-    return Transform.scale(
-      scale: 1.4,
-      child: SizedBox.square(
-        dimension: 24,
-        child: Checkbox(
-          value: todo.isDone,
-          onChanged: (value) {
-            if (value == null) return;
-            final udpatedTodo = todo.copyWith(isDone: value);
-            notifier.isTodoChanged(udpatedTodo);
-          },
+    return Skeleton.shade(
+      child: Transform.scale(
+        scale: 1.4,
+        child: SizedBox.square(
+          dimension: 24,
+          child: Checkbox(
+            value: todo.isDone,
+            onChanged: (value) {
+              if (value == null) return;
+              final udpatedTodo = todo.copyWith(isDone: value);
+              notifier.isTodoChanged(udpatedTodo);
+            },
+          ),
         ),
       ),
     );
@@ -117,7 +121,7 @@ class _TodoSubtileWidget extends StatelessWidget {
     final formattedDate = DateFormat.yMEd().format(todo.dueDate!);
     const success = Colors.green;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(32, 0, 8, 12),
+      padding: const EdgeInsets.fromLTRB(32, 0, 8, 0),
       child: Row(
         spacing: 4,
         children: [
@@ -147,6 +151,56 @@ class _DismissedContainer extends StatelessWidget {
         PhosphorIconsRegular.trash,
         color: Theme.of(context).colorScheme.error,
       ),
+    );
+  }
+}
+
+class _TodoOptions extends ConsumerWidget {
+  const _TodoOptions({required this.todo});
+
+  final Todo todo;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return PopupMenuButton<String>(
+      child: const Icon(PhosphorIconsBold.dotsThree),
+      onSelected: (String value) async {
+        if (value == 'Edit') {
+          ref.read(todoFormProvider.notifier).initializeWithTodo(todo);
+          await context.openTodoEditor();
+        }
+
+        if (value == 'Delete' && context.mounted) {
+          final shouldDelete = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Delete Todo?'),
+              content: const Text(
+                '''You are about to delete this todo. This aaction cannot be undone. Do you want to continue?''',
+              ),
+              actions: [
+                FilledButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text('Delete'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('Cancel'),
+                ),
+              ],
+            ),
+          );
+
+          if (shouldDelete ?? false) {
+            await ref.read(todosProvider.notifier).deleteTodo(todo);
+          }
+        }
+      },
+      itemBuilder: (BuildContext context) {
+        return ['Add sub-todo', 'Edit', 'Delete'].map((String choice) {
+          return PopupMenuItem<String>(value: choice, child: Text(choice));
+        }).toList();
+      },
     );
   }
 }

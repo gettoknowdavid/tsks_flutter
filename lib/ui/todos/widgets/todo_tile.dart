@@ -4,9 +4,11 @@ import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:tsks_flutter/domain/core/value_objects/uid.dart';
 import 'package:tsks_flutter/domain/models/todos/todo.dart';
+import 'package:tsks_flutter/ui/todos/providers/todo_form/todo_form_notifier.dart';
 import 'package:tsks_flutter/ui/todos/providers/todos_provider.dart';
+import 'package:tsks_flutter/ui/todos/widgets/todo_extensions.dart';
 
-class TodoTile extends StatelessWidget {
+class TodoTile extends ConsumerWidget {
   const TodoTile({
     required this.todo,
     this.padding = const EdgeInsets.all(16),
@@ -17,7 +19,7 @@ class TodoTile extends StatelessWidget {
   final EdgeInsetsGeometry padding;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Dismissible(
       key: ValueKey<Uid>(todo.uid),
       background: const _DismissedContainer(),
@@ -27,6 +29,11 @@ class TodoTile extends StatelessWidget {
         _ => null,
       },
       child: InkWell(
+        borderRadius: const BorderRadius.all(Radius.circular(18)),
+        onTap: () {
+          ref.read(todoFormProvider.notifier).initializeWithTodo(todo);
+          context.openTodoEditor();
+        },
         child: Card(
           child: Padding(
             padding: padding,

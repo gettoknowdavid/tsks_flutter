@@ -33,6 +33,18 @@ final class TodosRepository {
         .collection('todos');
   }
 
+  CollectionReference<Map<String, dynamic>> _subTodoReference({
+    required Uid collectionUid,
+    required Uid parentTodoUid,
+  }) {
+    return _userDocumentReference
+        .collection('collections')
+        .doc(collectionUid.getOrCrash)
+        .collection('todos')
+        .doc(parentTodoUid.getOrCrash)
+        .collection('sub-todos');
+  }
+
   Future<Either<TsksException, Todo>> createTodo({
     required Uid collectionUid,
     required SingleLineString title,
@@ -40,6 +52,7 @@ final class TodosRepository {
     bool? isDone = false,
     DateTime? dueDate,
     DateTime? updatedAt,
+    Uid? parentTodoUid,
   }) async {
     try {
       final data = {
@@ -49,9 +62,20 @@ final class TodosRepository {
         'isDone': isDone,
         'dueDate': dueDate?.toIso8601String(),
         'updatedAt': updatedAt?.toIso8601String(),
+        'parentTodoUid': parentTodoUid?.getOrNull,
       };
 
-      final documentReference = await _todoReference(collectionUid).add(data);
+      DocumentReference<Map<String, dynamic>> documentReference;
+
+      if (parentTodoUid != null) {
+        documentReference = await _subTodoReference(
+          collectionUid: collectionUid,
+          parentTodoUid: parentTodoUid,
+        ).add(data);
+      } else {
+        documentReference = await _todoReference(collectionUid).add(data);
+      }
+
       final snapshot = await documentReference.todoConverter.get();
       final todoDto = snapshot.data();
 
@@ -133,6 +157,28 @@ final class TodosRepository {
           .toList();
 
       return Right(todos);
+    } on TimeoutException {
+      return const Left(TsksTimeoutException());
+    } on Exception catch (e) {
+      return Left(TsksException(e.toString()));
+    }
+  }
+
+  Future<Either<TsksException, List<Todo?>>> getSubTodos({
+    required Uid collectionUid,
+    required Uid parentTodoUid,
+  }) async {
+    try {
+      final querySnapshot = await _subTodoReference(
+        collectionUid: collectionUid,
+        parentTodoUid: parentTodoUid,
+      ).todoConverter.get();
+
+      final subTodos = querySnapshot.docs
+          .map((snapshot) => snapshot.data()?.toDomain())
+          .toList();
+
+      return Right(subTodos);
     } on TimeoutException {
       return const Left(TsksTimeoutException());
     } on Exception catch (e) {

@@ -63,7 +63,7 @@ extension TodoExtensions on BuildContext {
                   children: [
                     if (parentTodo != null) ...[
                       ListTile(
-                        contentPadding: EdgeInsets.symmetric(
+                        contentPadding: const EdgeInsets.symmetric(
                           horizontal: 24,
                           vertical: 12,
                         ),
@@ -83,10 +83,10 @@ extension TodoExtensions on BuildContext {
                           style: theme.textTheme.labelSmall!.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
-                          child: Column(
+                          child: const Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              const SizedBox(height: 8),
+                              SizedBox(height: 8),
                               Text('COLLECTION: Groceries'),
                               Text('DUE DATE: Tuesday 12th June 2025'),
                             ],

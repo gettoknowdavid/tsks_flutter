@@ -17,6 +17,7 @@ final class TodoFormState with EquatableMixin {
     this.status = TodoFormStatus.initial,
     this.initialTodo,
     this.newTodo,
+    this.parentTodo,
     this.exception,
   });
 
@@ -28,6 +29,7 @@ final class TodoFormState with EquatableMixin {
   final TodoFormStatus status;
   final Todo? initialTodo;
   final Todo? newTodo;
+  final Todo? parentTodo;
   final TsksException? exception;
 
   TodoFormState withCollectionUid(Uid collectionUid) {
@@ -38,6 +40,19 @@ final class TodoFormState with EquatableMixin {
       isDone: isDone,
       dueDate: dueDate,
       initialTodo: initialTodo,
+      parentTodo: parentTodo,
+    );
+  }
+
+  TodoFormState withParentTodo(Todo parentTodo) {
+    return TodoFormState._(
+      collectionUid: collectionUid,
+      title: title,
+      createdAt: createdAt,
+      isDone: isDone,
+      dueDate: dueDate,
+      initialTodo: initialTodo,
+      parentTodo: parentTodo,
     );
   }
 
@@ -49,6 +64,7 @@ final class TodoFormState with EquatableMixin {
       isDone: isDone,
       dueDate: dueDate,
       initialTodo: initialTodo,
+      parentTodo: parentTodo,
     );
   }
 
@@ -60,6 +76,7 @@ final class TodoFormState with EquatableMixin {
       isDone: value ?? false,
       dueDate: dueDate,
       initialTodo: initialTodo,
+      parentTodo: parentTodo,
     );
   }
 
@@ -71,6 +88,7 @@ final class TodoFormState with EquatableMixin {
       isDone: isDone,
       dueDate: dueDateValue,
       initialTodo: initialTodo,
+      parentTodo: parentTodo,
     );
   }
 
@@ -82,6 +100,7 @@ final class TodoFormState with EquatableMixin {
       isDone: todo.isDone,
       dueDate: todo.dueDate,
       initialTodo: todo,
+      parentTodo: parentTodo,
     );
   }
 
@@ -94,6 +113,7 @@ final class TodoFormState with EquatableMixin {
       dueDate: dueDate,
       initialTodo: initialTodo,
       status: TodoFormStatus.loading,
+      parentTodo: parentTodo,
     );
   }
 
@@ -107,6 +127,7 @@ final class TodoFormState with EquatableMixin {
       initialTodo: initialTodo,
       status: TodoFormStatus.failure,
       exception: exception,
+      parentTodo: parentTodo,
     );
   }
 
@@ -120,6 +141,7 @@ final class TodoFormState with EquatableMixin {
       initialTodo: initialTodo,
       status: TodoFormStatus.success,
       newTodo: todo,
+      parentTodo: parentTodo,
     );
   }
 

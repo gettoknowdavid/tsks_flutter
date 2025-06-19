@@ -2,28 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:tsks_flutter/constants/fake_models.dart';
+import 'package:tsks_flutter/domain/core/exceptions/exceptions.dart';
 import 'package:tsks_flutter/domain/core/value_objects/uid.dart';
 import 'package:tsks_flutter/domain/models/todos/todo.dart';
-import 'package:tsks_flutter/routing/router_notifier.dart';
-import 'package:tsks_flutter/ui/todos/providers/todos_provider.dart';
+import 'package:tsks_flutter/ui/todos/providers/sub_todos_provider.dart';
 import 'package:tsks_flutter/ui/todos/widgets/todo_tile.dart';
 
-class TodoListWidget extends ConsumerWidget {
-  const TodoListWidget({super.key});
+class SubTodoListWidget extends ConsumerWidget {
+  const SubTodoListWidget({
+    required this.collectionUid,
+    required this.parentTodoUid,
+    super.key,
+  });
+
+  final Uid collectionUid;
+  final Uid parentTodoUid;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final router = ref.watch(routerConfigProvider);
-    final uidString = router.state.pathParameters['uid'];
-    final collectionUid = uidString != null ? Uid(uidString) : null;
-    final todos = ref.watch(todosProvider(collectionUid));
+    final subTodos = ref.watch(
+      subTodosProvider(
+        collectionUid: collectionUid,
+        parentTodoUid: parentTodoUid,
+      ),
+    );
 
-    return switch (todos) {
-      AsyncLoading() => TodoListBuilder(fakeTodos, isLoading: true),
-      AsyncData(:final value) => TodoListBuilder(value),
-      AsyncError(:final error) => Text(error.toString()),
-      _ => const SizedBox.shrink(),
-    };
+    return Padding(
+      padding: const EdgeInsets.only(left: 20),
+      child: switch (subTodos) {
+        AsyncLoading() => TodoListBuilder(fakeTodos, isLoading: true),
+        AsyncData(:final value) => TodoListBuilder(value),
+        AsyncError(:final error) => Text((error as TsksException).message),
+        _ => const SizedBox.shrink(),
+      },
+    );
   }
 }
 
@@ -43,7 +55,7 @@ class TodoListBuilder extends StatelessWidget {
         primary: false,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: todos.length,
-        separatorBuilder: (context, _) => const SizedBox(height: 16),
+        separatorBuilder: (context, _) => const SizedBox(height: 6),
         itemBuilder: (context, index) => TodoTile(
           key: ValueKey<Uid>(todos[index]!.uid),
           todo: todos[index]!,

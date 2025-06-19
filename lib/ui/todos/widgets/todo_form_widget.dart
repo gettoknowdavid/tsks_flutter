@@ -19,6 +19,7 @@ class TodoFormWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(GlobalKey<FormState>.new);
     final status = ref.watch(todoFormProvider.select((s) => s.status));
+    final parentTodo = ref.watch(todoFormProvider.select((s) => s.parentTodo));
 
     ref.listen(todoFormProvider, (previous, next) {
       if (previous?.status == next.status) return;
@@ -47,7 +48,7 @@ class TodoFormWidget extends HookConsumerWidget {
       },
       child: Form(
         key: formKey,
-        child: SingleChildScrollView(
+        child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
           child: Column(
             children: [
@@ -59,7 +60,9 @@ class TodoFormWidget extends HookConsumerWidget {
                 children: [
                   _CollectionField(key: Key('todoForm_collectionField')),
                   Expanded(
-                    child: _DateField(key: Key('todoForm_collectionDueDate')),
+                    child: _DateField(
+                      key: Key('todoForm_collectionDueDate'),
+                    ),
                   ),
                 ],
               ),
@@ -135,7 +138,7 @@ class _CollectionField extends HookConsumerWidget {
       items: _items(collections),
       value: selectedCollectionUid,
       onChanged: ref.read(todoFormProvider.notifier).collectionChanged,
-      enabled: pathUid == null || !status.isLoading,
+      enabled: !status.isLoading,
       validator: (_) => colUid.value.fold(
         (_) => 'Collection required',
         (_) => null,
@@ -192,7 +195,7 @@ class CollectionDropdownWidget extends StatelessWidget {
         iconSize: 14,
         icon: const Icon(PhosphorIconsBold.caretDown),
         style: Theme.of(context).textTheme.labelLarge,
-        onChanged: enabled ? null : onChanged,
+        onChanged: !enabled ? null : onChanged,
         items: items,
         validator: validator,
       ),

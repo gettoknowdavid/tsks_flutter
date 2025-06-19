@@ -1,8 +1,6 @@
-import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:tsks_flutter/data/dtos/todos/todo_dto.dart';
 import 'package:tsks_flutter/data/repositories/todos/todos_repository.dart';
 import 'package:tsks_flutter/domain/core/exceptions/exceptions.dart';
 import 'package:tsks_flutter/domain/core/value_objects/value_objects.dart';
@@ -20,6 +18,8 @@ class TodoForm extends _$TodoForm {
     if (uid == null) return;
     state = state.withCollectionUid(uid);
   }
+
+  void parentTodoChanged(Todo todo) => state = state.withParentTodo(todo);
 
   void titleChanged(String title) => state = state.withTitle(title);
 
@@ -39,30 +39,104 @@ class TodoForm extends _$TodoForm {
 
     state = state.withSubmissionProgress();
     final repository = ref.read(todosRepositoryProvider);
-    final Either<TsksException, Todo> response;
+    Either<TsksException, Todo> response;
+
+    // if (isEditing) {
+    //   final dataToUpdate = <String, dynamic>{};
+    //
+    //   final initialDto = TodoDto.fromDomain(initialTodo);
+    //   final initialData = initialDto.toJson();
+    //   final currentData = state.toJson();
+    //
+    //   // Dynamically iterate and compare
+    //   currentData.forEach((key, value) {
+    //     // Compare each proper from the state with that from the
+    //     // initial collection, and if a field matches, add that field to the
+    //     // `dataToUpdate` map
+    //     if (!const DeepCollectionEquality().equals(value, initialData[key])) {
+    //       dataToUpdate[key] = value;
+    //     }
+    //   });
+    //
+    //   response = await repository.updateTodo(
+    //     uid: initialTodo.uid,
+    //     collectionUid: initialTodo.collectionUid,
+    //     data: dataToUpdate,
+    //     parentTodoUid: initialTodo.parentTodoUid,
+    //   );
+    // } else {
+    //   response = await repository.createTodo(
+    //     collectionUid: state.collectionUid,
+    //     title: state.title,
+    //     createdAt: state.createdAt,
+    //     dueDate: state.dueDate,
+    //     isDone: state.isDone,
+    //     parentTodoUid: state.parentTodo?.uid,
+    //   );
+    // }
 
     if (isEditing) {
-      final dataToUpdate = <String, dynamic>{};
+      // Check if the collection or parent has changed
+      final hasMoved =
+          state.collectionUid != initialTodo.collectionUid ||
+          state.parentTodo?.uid != initialTodo.parentTodoUid;
 
-      final initialDto = TodoDto.fromDomain(initialTodo);
-      final initialData = initialDto.toJson();
-      final currentData = state.toJson();
-
-      // Dynamically iterate and compare
-      currentData.forEach((key, value) {
-        // Compare each proper from the state with that from the
-        // initial collection, and if a field matches, add that field to the
-        // `dataToUpdate` map
-        if (!const DeepCollectionEquality().equals(value, initialData[key])) {
-          dataToUpdate[key] = value;
+      if (hasMoved) {
+        if (initialTodo.parentTodoUid != null) {
+          // It's a sub-todo being moved
+          response = await repository
+              .moveSubTodo(
+                subTodoToMove: initialTodo.copyWith(
+                  title: state.title,
+                  isDone: state.isDone,
+                  dueDate: state.dueDate,
+                ), // Pass updated data
+                newCollectionUid: state.collectionUid,
+                newParentTodoUid: state.parentTodo!.uid,
+              )
+              .then(
+                (either) => either.map((_) => initialTodo),
+              ); // Adjust return type if needed
+        } else {
+          // It's a top-level todo being moved
+          response = await repository
+              .moveTodoToCollection(
+                todoToMove: initialTodo.copyWith(
+                  title: state.title,
+                  isDone: state.isDone,
+                  dueDate: state.dueDate,
+                ), // Pass updated data
+                newCollectionUid: state.collectionUid,
+              )
+              .then(
+                (either) => either.map((_) => initialTodo),
+              ); // Adjust return type if needed
         }
-      });
+      } else {
+        // --- HANDLE THE SIMPLE UPDATE SCENARIO (NO MOVE) ---
+        final dataToUpdate = <String, dynamic>{};
+        if (state.title != initialTodo.title) {
+          dataToUpdate['title'] = state.title.getOrCrash;
+        }
+        if (state.isDone != initialTodo.isDone) {
+          dataToUpdate['isDone'] = state.isDone;
+        }
+        if (state.dueDate != initialTodo.dueDate) {
+          dataToUpdate['dueDate'] = state.dueDate;
+        }
 
-      response = await repository.updateTodo(
-        uid: initialTodo.uid,
-        collectionUid: initialTodo.collectionUid,
-        data: dataToUpdate,
-      );
+        if (dataToUpdate.isNotEmpty) {
+          response = await repository.updateTodo(
+            uid: initialTodo.uid,
+            collectionUid: initialTodo.collectionUid,
+            data: dataToUpdate,
+            parentTodoUid: initialTodo.parentTodoUid,
+          );
+        } else {
+          // Nothing changed, so we can exit early.
+          response = Right(initialTodo);
+        }
+      }
     } else {
       response = await repository.createTodo(
         collectionUid: state.collectionUid,
@@ -70,6 +144,7 @@ class TodoForm extends _$TodoForm {
         createdAt: state.createdAt,
         dueDate: state.dueDate,
         isDone: state.isDone,
+        parentTodoUid: state.parentTodo?.uid,
       );
     }
 

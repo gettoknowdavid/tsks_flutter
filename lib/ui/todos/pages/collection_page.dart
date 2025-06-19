@@ -104,31 +104,16 @@ class _MoreOptions extends ConsumerWidget {
       child: const Icon(PhosphorIconsBold.dotsThree),
       onSelected: (String value) async {
         if (collection == null) return;
-        if (value == 'Edit') {
+        if (value == 'edit') {
           final notifier = ref.read(collectionFormProvider.notifier);
           notifier.initializeWithCollection(collection);
           await context.openCollectionEditor();
-        } else if (value == 'Delete') {
-          final shouldDelete = await showDialog<bool>(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Delete Collection?'),
-              content: const Text(
-                '''You are about to delete this collection. This aaction cannot be undone. Do you want to continue?''',
-              ),
-              actions: [
-                FilledButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  child: const Text('Delete'),
-                ),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Cancel'),
-                ),
-              ],
-            ),
+        } else if (value == 'delete') {
+          final shouldDelete = await context.showConfirmationDialog(
+            title: 'Delete Collection?',
+            description:
+                '''You are about to delete this todo. This aaction cannot be undone. Do you want to continue?''',
           );
-
           if (shouldDelete ?? false) {
             final uid = collection.uid;
             final notifier = ref.read(collectionNotifierProvider(uid).notifier);
@@ -143,7 +128,7 @@ class _MoreOptions extends ConsumerWidget {
         }
       },
       itemBuilder: (BuildContext context) {
-        return ['Edit', 'Delete'].map((String choice) {
+        return ['edit', 'delete'].map((String choice) {
           return PopupMenuItem<String>(value: choice, child: Text(choice));
         }).toList();
       },

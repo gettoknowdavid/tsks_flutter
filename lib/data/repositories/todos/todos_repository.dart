@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:tsks_flutter/data/dtos/timestamp_converter.dart';
+import 'package:tsks_flutter/data/dtos/todos/todo_dto.dart';
 import 'package:tsks_flutter/data/services/cloud_firestore.dart';
 import 'package:tsks_flutter/domain/core/exceptions/exceptions.dart';
 import 'package:tsks_flutter/domain/core/value_objects/value_objects.dart';
@@ -15,15 +18,23 @@ part 'todos_repository.g.dart';
 
 @riverpod
 TodosRepository todosRepository(Ref ref) {
+  final firestore = ref.read(firestoreProvider);
   final userDocumentReference = ref.read(userDocumentReferenceProvider);
-  return TodosRepository(userDocumentReference: userDocumentReference);
+
+  return TodosRepository(
+    firestore: firestore,
+    userDocumentReference: userDocumentReference,
+  );
 }
 
 final class TodosRepository {
   const TodosRepository({
+    required FirebaseFirestore firestore,
     required DocumentReference<User> userDocumentReference,
-  }) : _userDocumentReference = userDocumentReference;
+  }) : _firestore = firestore,
+       _userDocumentReference = userDocumentReference;
 
+  final FirebaseFirestore _firestore;
   final DocumentReference<User> _userDocumentReference;
 
   CollectionReference<Map<String, dynamic>> _todoReference(Uid collectionUid) {
@@ -42,7 +53,7 @@ final class TodosRepository {
         .doc(collectionUid.getOrCrash)
         .collection('todos')
         .doc(parentTodoUid.getOrCrash)
-        .collection('sub-todos');
+        .collection('subTodos');
   }
 
   Future<Either<TsksException, Todo>> createTodo({
@@ -51,19 +62,22 @@ final class TodosRepository {
     required DateTime createdAt,
     bool? isDone = false,
     DateTime? dueDate,
-    DateTime? updatedAt,
     Uid? parentTodoUid,
   }) async {
     try {
       final data = {
+        'ownerUid': _userDocumentReference.id,
         'collectionUid': collectionUid.getOrCrash,
         'title': title.getOrCrash,
-        'createdAt': createdAt.toIso8601String(),
+        'createdAt': const TimestampConverter().toJson(createdAt),
         'isDone': isDone,
-        'dueDate': dueDate?.toIso8601String(),
-        'updatedAt': updatedAt?.toIso8601String(),
+        'dueDate': dueDate != null
+            ? const TimestampConverter().toJson(dueDate)
+            : null,
         'parentTodoUid': parentTodoUid?.getOrNull,
       };
+
+      log(data.toString());
 
       DocumentReference<Map<String, dynamic>> documentReference;
 
@@ -90,9 +104,21 @@ final class TodosRepository {
 
   Future<Either<TsksException, Unit>> markTodo(Todo todo) async {
     try {
-      await _todoReference(
-        todo.collectionUid,
-      ).doc(todo.uid.getOrCrash).update({'isDone': todo.isDone});
+      final parentTodoUid = todo.parentTodoUid;
+      final updatePayload = {
+        'isDone': todo.isDone,
+        'updatedAt': const TimestampConverter().toJson(DateTime.now()),
+      };
+      if (parentTodoUid != null) {
+        await _subTodoReference(
+          collectionUid: todo.collectionUid,
+          parentTodoUid: parentTodoUid,
+        ).doc(todo.uid.getOrCrash).update(updatePayload);
+      } else {
+        await _todoReference(
+          todo.collectionUid,
+        ).doc(todo.uid.getOrCrash).update(updatePayload);
+      }
       return const Right(unit);
     } on TimeoutException {
       return const Left(TsksTimeoutException());
@@ -105,16 +131,29 @@ final class TodosRepository {
     required Uid uid,
     required Uid collectionUid,
     required Map<String, dynamic> data,
+    Uid? parentTodoUid,
   }) async {
     if (data.isEmpty) return const Left(NoTodoFoundException());
 
     try {
-      final documentReference = _todoReference(
-        collectionUid,
-      ).doc(uid.getOrCrash);
+      final uidStr = uid.getOrCrash;
+      DocumentReference<Map<String, dynamic>> documentReference;
 
-      await _todoReference(collectionUid).doc(uid.getOrCrash).update(data);
+      if (parentTodoUid == null) {
+        documentReference = _todoReference(collectionUid).doc(uidStr);
+      } else {
+        documentReference = _subTodoReference(
+          collectionUid: collectionUid,
+          parentTodoUid: parentTodoUid,
+        ).doc(uidStr);
+      }
 
+      final updatedAt = const TimestampConverter().toJson(DateTime.now());
+      data['updatedAt'] = updatedAt;
+
+      log('DATA FOR UID($uidStr): $data');
+
+      await documentReference.update(data);
       final snapshot = await documentReference.todoConverter.get();
       final todoDto = snapshot.data();
 
@@ -130,12 +169,29 @@ final class TodosRepository {
     }
   }
 
-  Future<Either<TsksException, Unit>> deleteTodo({
-    required Uid todoUid,
-    required Uid collectionUid,
-  }) async {
+  Future<Either<TsksException, Unit>> deleteTodo(Todo todo) async {
     try {
-      await _todoReference(collectionUid).doc(todoUid.getOrCrash).delete();
+      final todoUid = todo.uid.getOrCrash;
+      final collectionUid = todo.collectionUid;
+      final parentTodoUid = todo.parentTodoUid;
+      if (parentTodoUid == null) {
+        // Top-level todo: need to also delete its sub-collection
+        await _firestore.runTransaction((transaction) async {
+          final parentDocument = _todoReference(collectionUid).doc(todoUid);
+          transaction.delete(parentDocument);
+
+          // Delete all sub-todos within its sub-collection
+          final subTodos = await parentDocument.collection('subTodos').get();
+          for (final doc in subTodos.docs) {
+            transaction.delete(doc.reference);
+          }
+        });
+      } else {
+        await _subTodoReference(
+          collectionUid: collectionUid,
+          parentTodoUid: parentTodoUid,
+        ).doc(todoUid).delete();
+      }
       return const Right(unit);
     } on TimeoutException {
       return const Left(TsksTimeoutException());
@@ -179,6 +235,98 @@ final class TodosRepository {
           .toList();
 
       return Right(subTodos);
+    } on TimeoutException {
+      return const Left(TsksTimeoutException());
+    } on Exception catch (e) {
+      return Left(TsksException(e.toString()));
+    }
+  }
+
+  // In your TodosRepository class
+
+  /// Moves a top-level todo to a different collection.
+  Future<Either<TsksException, Unit>> moveTodoToCollection({
+    required Todo todoToMove,
+    required Uid newCollectionUid,
+  }) async {
+    try {
+      // 1. Define references to the old and new locations.
+      final oldDocRef = _todoReference(
+        todoToMove.collectionUid,
+      ).doc(todoToMove.uid.getOrCrash);
+      final newDocRef = _todoReference(
+        newCollectionUid,
+      ).doc(todoToMove.uid.getOrCrash);
+
+      // 2. Create the new data object with the updated collection Uid.
+      final newTodoData = TodoDto.fromDomain(
+        todoToMove,
+      ).copyWith(collectionUid: newCollectionUid.getOrCrash).toJson();
+
+      // 3. Run the move as an atomic transaction.
+      await _firestore.runTransaction((transaction) async {
+        // We get the old doc first to ensure it still exists.
+        final oldDocSnapshot = await transaction.get(oldDocRef);
+        if (!oldDocSnapshot.exists) {
+          throw const NoTodoFoundException();
+        }
+
+        // Create the new document and delete the old one.
+        transaction.set(newDocRef, newTodoData);
+        transaction.delete(oldDocRef);
+      });
+
+      return const Right(unit);
+    } on TimeoutException {
+      return const Left(TsksTimeoutException());
+    } on Exception catch (e) {
+      return Left(TsksException(e.toString()));
+    }
+  }
+
+  /// Moves a sub-todo to a different parent todo (and/or collection).
+  Future<Either<TsksException, Unit>> moveSubTodo({
+    required Todo subTodoToMove,
+    required Uid newCollectionUid,
+    required Uid newParentTodoUid,
+  }) async {
+    // Ensure the sub-todo being moved actually has a parent.
+    if (subTodoToMove.parentTodoUid == null) {
+      return const Left(TsksException('Cannot move a top-level todo.'));
+    }
+
+    try {
+      // 1. Define references to the old and new locations.
+      final oldDocRef = _subTodoReference(
+        collectionUid: subTodoToMove.collectionUid,
+        parentTodoUid: subTodoToMove.parentTodoUid!,
+      ).doc(subTodoToMove.uid.getOrCrash);
+
+      final newDocRef = _subTodoReference(
+        collectionUid: newCollectionUid,
+        parentTodoUid: newParentTodoUid,
+      ).doc(subTodoToMove.uid.getOrCrash);
+
+      // 2. Create the new data object with updated Uids.
+      final newSubTodo = subTodoToMove.copyWith(
+        collectionUid: newCollectionUid,
+        parentTodoUid: newParentTodoUid,
+      );
+
+      final newSubTodoData = TodoDto.fromDomain(newSubTodo).toJson();
+
+      // 3. Run the move as an atomic transaction.
+      await _firestore.runTransaction((transaction) async {
+        final oldDocSnapshot = await transaction.get(oldDocRef);
+        if (!oldDocSnapshot.exists) {
+          throw const NoTodoFoundException();
+        }
+
+        transaction.set(newDocRef, newSubTodoData);
+        transaction.delete(oldDocRef);
+      });
+
+      return const Right(unit);
     } on TimeoutException {
       return const Left(TsksTimeoutException());
     } on Exception catch (e) {

@@ -32,7 +32,7 @@ class CollectionTile extends ConsumerWidget {
           final shouldDelete = await context.showConfirmationDialog(
             title: 'Delete Collection?',
             description:
-                '''You are about to delete this todo. This aaction cannot be undone. Do you want to continue?''',
+                '''You are about to delete this collection. This aaction cannot be undone. Do you want to continue?''',
           );
 
           if (shouldDelete ?? false) {

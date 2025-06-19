@@ -63,10 +63,7 @@ class Todos extends _$Todos {
     }
 
     final repository = ref.read(todosRepositoryProvider);
-    final response = await repository.deleteTodo(
-      todoUid: todo.uid,
-      collectionUid: todo.collectionUid,
-    );
+    final response = await repository.deleteTodo(todo);
 
     state = response.fold(
       (exception) {

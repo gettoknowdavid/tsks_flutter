@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_framework.dart';
+import 'package:tsks_flutter/domain/models/todos/todo.dart';
 import 'package:tsks_flutter/ui/todos/widgets/collection_form_widget.dart';
 import 'package:tsks_flutter/ui/todos/widgets/todo_form_widget.dart';
 
@@ -33,7 +34,8 @@ extension TodoExtensions on BuildContext {
     }
   }
 
-  Future<void> openTodoEditor() async {
+  Future<void> openTodoEditor({Todo? parentTodo}) async {
+    final theme = Theme.of(this);
     final isMobile = ResponsiveBreakpoints.of(this).smallerThan(TABLET);
     if (isMobile) {
       await showModalBottomSheet<void>(
@@ -50,14 +52,70 @@ extension TodoExtensions on BuildContext {
       await showDialog<void>(
         context: this,
         barrierDismissible: false,
-        builder: (context) => const MaxWidthBox(
-          maxWidth: 560,
-          child: Dialog(
-            alignment: Alignment.topCenter,
-            insetPadding: EdgeInsets.fromLTRB(40, 160, 40, 0),
-            child: TodoFormWidget(),
-          ),
-        ),
+        builder: (context) {
+          return Material(
+            color: Colors.transparent,
+            child: MaxWidthBox(
+              maxWidth: 560,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(40, 160, 40, 0),
+                child: Column(
+                  children: [
+                    if (parentTodo != null) ...[
+                      ListTile(
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              'Parent Todo',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            Text(parentTodo.title.getOrCrash),
+                          ],
+                        ),
+                        subtitle: DefaultTextStyle(
+                          style: theme.textTheme.labelSmall!.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              const SizedBox(height: 8),
+                              Text('COLLECTION: Groceries'),
+                              Text('DUE DATE: Tuesday 12th June 2025'),
+                            ],
+                          ),
+                        ),
+                        tileColor: theme.colorScheme.surfaceContainerHigh,
+                        shape: RoundedSuperellipseBorder(
+                          side: BorderSide(
+                            width: 2,
+                            color: theme.colorScheme.tertiaryContainer,
+                          ),
+                          borderRadius: const BorderRadiusGeometry.all(
+                            Radius.circular(16),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                    const Dialog(
+                      alignment: Alignment.topCenter,
+                      insetPadding: EdgeInsets.zero,
+                      child: TodoFormWidget(),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
       );
     }
   }

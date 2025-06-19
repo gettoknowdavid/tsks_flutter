@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:tsks_flutter/data/dtos/timestamp_converter.dart';
 import 'package:tsks_flutter/data/services/cloud_firestore.dart';
 import 'package:tsks_flutter/domain/core/exceptions/tsks_exception.dart';
 import 'package:tsks_flutter/domain/core/value_objects/value_objects.dart';
@@ -38,12 +40,14 @@ final class CollectionsRepository {
     Map<String, dynamic>? iconMap,
   }) async {
     try {
+      log(_userDocRef.id);
       final documentReference = await _collectionRef.add({
+        'ownerUid': _userDocRef.id,
         'title': title.getOrCrash,
-        'isFavourite': isFavourite,
+        'isFavourite': isFavourite ?? false,
         'colorARGB': colorARGB,
         'iconMap': iconMap,
-        'createdAt': createdAt.toIso8601String(),
+        'createdAt': const TimestampConverter().toJson(createdAt),
       });
 
       final snapshot = await documentReference.collectionConverter.get();

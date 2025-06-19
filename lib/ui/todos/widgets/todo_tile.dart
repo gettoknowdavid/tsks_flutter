@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:skeletonizer/skeletonizer.dart';
-import 'package:tsks_flutter/domain/core/value_objects/uid.dart';
 import 'package:tsks_flutter/domain/models/todos/todo.dart';
 import 'package:tsks_flutter/ui/todos/providers/todo_form/todo_form_notifier.dart';
 import 'package:tsks_flutter/ui/todos/providers/todos_provider.dart';
+import 'package:tsks_flutter/ui/todos/widgets/base_todo_tile_widget.dart';
+import 'package:tsks_flutter/ui/todos/widgets/sub_todo_list_widget.dart';
 import 'package:tsks_flutter/ui/todos/widgets/todo_extensions.dart';
 
-class TodoTile extends ConsumerWidget {
+class TodoTile extends HookConsumerWidget {
   const TodoTile({
     required this.todo,
     this.padding = const EdgeInsets.all(16),
@@ -21,182 +21,120 @@ class TodoTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Future<void> deleteTodo() async {
-      final collectionUid = todo.collectionUid;
-      final notifier = ref.read(todosProvider(collectionUid).notifier);
-      await notifier.deleteTodo(todo);
-    }
+    final isExpanded = useState<bool>(false);
 
-    return Dismissible(
-      key: ValueKey<Uid>(todo.uid),
-      background: const _DismissedContainer(),
-      direction: DismissDirection.endToStart,
-      onDismissed: (direction) => switch (direction) {
-        DismissDirection.endToStart => deleteTodo(),
-        _ => null,
-      },
-      confirmDismiss: (direction) async {
-        if (direction == DismissDirection.endToStart) {
-          return context.deleteTodoConfirmationDialog();
-        }
+    final collectionUid = todo.collectionUid;
+    final todoFormNotifier = ref.read(todoFormProvider.notifier);
 
-        return null;
-      },
-      child: InkWell(
-        borderRadius: const BorderRadius.all(Radius.circular(18)),
-        onTap: () {
-          ref.read(todoFormProvider.notifier).initializeWithTodo(todo);
-          context.openTodoEditor();
-        },
-        child: Card(
-          child: Padding(
-            padding: padding,
-            child: Column(
-              spacing: 4,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  spacing: 12,
-                  children: [
-                    _TodoCheckboxWidget(todo: todo),
-                    Expanded(child: _TodoTitleWidget(todo: todo)),
-                    _TodoOptions(todo: todo),
-                  ],
-                ),
-                _TodoSubtileWidget(todo: todo),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+    final isSubTodo = todo.parentTodoUid != null;
 
-class _TodoCheckboxWidget extends ConsumerWidget {
-  const _TodoCheckboxWidget({required this.todo});
-
-  final Todo todo;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final notifier = ref.read(todosProvider(todo.collectionUid).notifier);
-    return Skeleton.shade(
-      child: Transform.scale(
-        scale: 1.4,
-        child: SizedBox.square(
-          dimension: 24,
-          child: Checkbox(
-            value: todo.isDone,
-            onChanged: (value) {
-              if (value == null) return;
-              final udpatedTodo = todo.copyWith(isDone: value);
-              notifier.isTodoChanged(udpatedTodo);
-            },
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _TodoTitleWidget extends StatelessWidget {
-  const _TodoTitleWidget({required this.todo});
-
-  final Todo todo;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Text(
-      todo.title.getOrCrash,
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-      style: theme.textTheme.titleMedium?.copyWith(
-        fontWeight: FontWeight.w500,
-        color: theme.colorScheme.onSurfaceVariant,
-        decoration: todo.isDone ? TextDecoration.lineThrough : null,
-      ),
-    );
-  }
-}
-
-class _TodoSubtileWidget extends StatelessWidget {
-  const _TodoSubtileWidget({required this.todo});
-
-  final Todo todo;
-
-  @override
-  Widget build(BuildContext context) {
-    if (todo.dueDate == null) return const SizedBox();
-
-    final textTheme = Theme.of(context).textTheme;
-    final formattedDate = DateFormat.yMEd().format(todo.dueDate!);
-    const success = Colors.green;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(32, 0, 8, 0),
-      child: Row(
-        spacing: 4,
-        children: [
-          const Icon(Icons.calendar_today, color: success, size: 12),
-          Text(
-            formattedDate,
-            style: textTheme.labelSmall?.copyWith(
-              color: success,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DismissedContainer extends StatelessWidget {
-  const _DismissedContainer();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.centerRight,
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Icon(
-        PhosphorIconsRegular.trash,
-        color: Theme.of(context).colorScheme.error,
-      ),
-    );
-  }
-}
-
-class _TodoOptions extends ConsumerWidget {
-  const _TodoOptions({required this.todo});
-
-  final Todo todo;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return PopupMenuButton<String>(
-      child: const Icon(PhosphorIconsBold.dotsThree),
-      onSelected: (String value) async {
-        if (value == 'Edit') {
-          ref.read(todoFormProvider.notifier).initializeWithTodo(todo);
+    Future<void> handleMenuSelection(String choice) async {
+      switch (choice) {
+        case 'edit':
+          todoFormNotifier.initializeWithTodo(todo);
           await context.openTodoEditor();
-        }
+        case 'delete':
+          final shouldDelete = await context.showConfirmationDialog(
+            title: 'Delete Todo?',
+            description:
+                '''You are about to delete this todo. This aaction cannot be undone. Do you want to continue?''',
+          );
 
-        if (value == 'Delete' && context.mounted) {
-          final shouldDelete = await context.deleteTodoConfirmationDialog();
           if (shouldDelete ?? false) {
-            final collectionUid = todo.collectionUid;
             final notifier = ref.read(todosProvider(collectionUid).notifier);
             await notifier.deleteTodo(todo);
           }
-        }
-      },
-      itemBuilder: (BuildContext context) {
-        return ['Add sub-todo', 'Edit', 'Delete'].map((String choice) {
-          return PopupMenuItem<String>(value: choice, child: Text(choice));
-        }).toList();
-      },
+        case 'add_sub_todo':
+          if (todo.parentTodoUid != null) return;
+          todoFormNotifier.parentTodoChanged(todo);
+          todoFormNotifier.collectionChanged(todo.collectionUid);
+          await context.openTodoEditor(parentTodo: todo);
+      }
+    }
+
+    return Column(
+      children: [
+        BaseTodoListTile(
+          todo: todo,
+          onSecondaryTapDown: (details) => _showContextMenu(
+            context,
+            details,
+            handleMenuSelection,
+            isSubTodo: isSubTodo,
+          ),
+          trailing: isSubTodo
+              ? null
+              : IconButton(
+                  onPressed: () => isExpanded.value = !isExpanded.value,
+                  iconSize: 16,
+                  icon: isExpanded.value
+                      ? const Icon(PhosphorIconsBold.caretUp)
+                      : const Icon(PhosphorIconsBold.caretDown),
+                ),
+        ),
+        if (!isSubTodo)
+          if (isExpanded.value) ...[
+            const SizedBox(height: 6),
+            SubTodoListWidget(
+              collectionUid: todo.collectionUid,
+              parentTodoUid: todo.uid,
+            ),
+          ],
+      ],
     );
+  }
+
+  Future<void> _showContextMenu(
+    BuildContext context,
+    TapDownDetails details,
+    void Function(String) onSelected, {
+    bool isSubTodo = false,
+  }) async {
+    final colors = Theme.of(context).colorScheme;
+
+    final globalPosition = details.globalPosition;
+    final position = RelativeRect.fromLTRB(
+      globalPosition.dx,
+      globalPosition.dy,
+      globalPosition.dx,
+      globalPosition.dy,
+    );
+
+    final choice = await showMenu<String>(
+      context: context,
+      position: position,
+      useRootNavigator: true,
+      shape: RoundedSuperellipseBorder(
+        borderRadius: const BorderRadiusGeometry.all(Radius.circular(24)),
+        side: BorderSide(width: 2, color: colors.secondaryContainer),
+      ),
+      items: <PopupMenuEntry<String>>[
+        PopupMenuItem<String>(
+          value: 'add_sub_todo',
+          enabled: !isSubTodo,
+          child: const ListTile(
+            leading: Icon(PhosphorIconsBold.checkSquare),
+            title: Text('Add Sub-Todo'),
+          ),
+        ),
+        const PopupMenuItem<String>(
+          value: 'edit',
+          child: ListTile(
+            leading: Icon(PhosphorIconsBold.pencilSimple),
+            title: Text('Edit Todo'),
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'delete',
+          child: ListTile(
+            leading: const Icon(PhosphorIconsBold.trash),
+            title: const Text('Delete Todo'),
+            iconColor: colors.error,
+            textColor: colors.error,
+          ),
+        ),
+      ],
+    );
+    if (choice != null) onSelected(choice);
   }
 }

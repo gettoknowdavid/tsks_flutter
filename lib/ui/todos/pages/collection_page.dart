@@ -9,6 +9,7 @@ import 'package:tsks_flutter/ui/core/ui/page_widget.dart';
 import 'package:tsks_flutter/ui/core/ui/tsks_snackbar.dart';
 import 'package:tsks_flutter/ui/todos/providers/collection_form/collection_form.dart';
 import 'package:tsks_flutter/ui/todos/providers/collection_notifier.dart';
+import 'package:tsks_flutter/ui/todos/providers/todo_form/todo_form_notifier.dart';
 import 'package:tsks_flutter/ui/todos/providers/todo_mover.dart';
 import 'package:tsks_flutter/ui/todos/providers/todos_provider.dart';
 import 'package:tsks_flutter/ui/todos/widgets/todo_extensions.dart';
@@ -68,6 +69,9 @@ class CollectionPage extends ConsumerWidget {
                 ),
               ],
               const SizedBox(height: 40),
+              const _AddTodoButton(key: Key('CollectionPageAddTodoButton')),
+              const SizedBox(height: 40),
+
               if (isTodoMoveInProgress)
                 const Skeletonizer(child: TodoListWidget())
               else
@@ -76,6 +80,35 @@ class CollectionPage extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _AddTodoButton extends ConsumerWidget {
+  const _AddTodoButton({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colors = Theme.of(context).colorScheme;
+
+    final routerConfig = ref.watch(routerConfigProvider);
+    final collectionUidFromPath = routerConfig.state.pathParameters['uid'];
+    final collectionUid = collectionUidFromPath != null
+        ? Uid(collectionUidFromPath)
+        : null;
+
+    return ListTile(
+      leading: const Icon(PhosphorIconsFill.plusCircle),
+      title: const Text('Add a todo'),
+      shape: RoundedSuperellipseBorder(
+        borderRadius: const BorderRadiusGeometry.all(Radius.circular(16)),
+        side: BorderSide(width: 2, color: colors.outlineVariant),
+      ),
+      onTap: () {
+        final todoFormNotifier = ref.read(todoFormProvider.notifier);
+        todoFormNotifier.collectionChanged(collectionUid);
+        context.openTodoEditor();
+      },
     );
   }
 }

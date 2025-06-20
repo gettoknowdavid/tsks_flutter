@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fpdart/fpdart.dart';
@@ -27,7 +26,7 @@ final class CollectionsRepository {
 
   final DocumentReference<User> _userDocumentReference;
 
-  CollectionReference<Map<String, dynamic>> get _collectionRef {
+  CollectionReference<Map<String, dynamic>> get _collectionReference {
     return _userDocumentReference.collection('collections');
   }
 
@@ -38,8 +37,7 @@ final class CollectionsRepository {
     Map<String, dynamic>? iconMap,
   }) async {
     try {
-      log(_userDocumentReference.id);
-      final documentReference = await _collectionRef.add({
+      final documentReference = await _collectionReference.add({
         'ownerUid': _userDocumentReference.id,
         'title': title.getOrCrash,
         'isFavourite': isFavourite ?? false,
@@ -71,7 +69,7 @@ final class CollectionsRepository {
     if (data.isEmpty) return const Left(NoCollectionFoundException());
 
     try {
-      final documentReference = _collectionRef.doc(uid.getOrCrash);
+      final documentReference = _collectionReference.doc(uid.getOrCrash);
 
       await documentReference.update(data);
 
@@ -92,7 +90,7 @@ final class CollectionsRepository {
 
   Future<Either<TsksException, Uid>> deleteCollection(Uid uid) async {
     try {
-      await _collectionRef.doc(uid.getOrCrash).delete();
+      await _collectionReference.doc(uid.getOrCrash).delete();
       return Right(uid);
     } on TimeoutException {
       return const Left(TsksTimeoutException());
@@ -103,7 +101,7 @@ final class CollectionsRepository {
 
   Future<Either<TsksException, List<Collection?>>> getCollections() async {
     try {
-      final querySnapshot = await _collectionRef.collectionConverter
+      final querySnapshot = await _collectionReference.collectionConverter
           .orderBy('updatedAt', descending: true)
           .get();
 
@@ -122,10 +120,42 @@ final class CollectionsRepository {
   Future<Either<TsksException, Collection>> getCollection(Uid uid) async {
     try {
       final uidStr = uid.getOrCrash;
-      final doc = await _collectionRef.collectionConverter.doc(uidStr).get();
+      final doc = await _collectionReference.collectionConverter
+          .doc(uidStr)
+          .get();
       final collection = doc.data()?.toDomain();
       if (collection == null) return const Left(NoCollectionFoundException());
       return Right(collection);
+    } on TimeoutException {
+      return const Left(TsksTimeoutException());
+    } on Exception catch (e) {
+      return Left(TsksException(e.toString()));
+    }
+  }
+
+  Future<Either<TsksException, int>> getNumberOfTodos(Uid uid) async {
+    try {
+      final uidStr = uid.getOrCrash;
+      final aggregateQuery = _collectionReference
+          .doc(uidStr)
+          .collection('todos')
+          .count();
+      final countQuery = await aggregateQuery.get();
+      return Right(countQuery.count ?? 0);
+    } on TimeoutException {
+      return const Left(TsksTimeoutException());
+    } on Exception catch (e) {
+      return Left(TsksException(e.toString()));
+    }
+  }
+
+  Future<Either<TsksException, int>> getNumberOfDoneTodos(Uid uid) async {
+    try {
+      final uidStr = uid.getOrCrash;
+      final reference = _collectionReference.doc(uidStr).collection('todos');
+      final aggregateQuery = reference.where('isDone', isEqualTo: true).count();
+      final countQuery = await aggregateQuery.get();
+      return Right(countQuery.count ?? 0);
     } on TimeoutException {
       return const Left(TsksTimeoutException());
     } on Exception catch (e) {

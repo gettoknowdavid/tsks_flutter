@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -38,9 +36,8 @@ class TodoTile extends HookConsumerWidget {
           await context.openTodoEditor();
         case 'move':
           todoFormNotifier.initializeWithTodo(todo);
-          final collectionUid = await context.openCollectionsSelector();
-          log(collectionUid.toString());
-          if (collectionUid == null) return;
+          final uid = await context.openCollectionsSelector();
+          if (uid == null || uid == collectionUid) return;
           await ref
               .read(todoMoverProvider.notifier)
               .moveTodoToCollection(todo, collectionUid);

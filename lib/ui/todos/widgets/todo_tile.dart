@@ -1,9 +1,12 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:tsks_flutter/domain/models/todos/todo.dart';
 import 'package:tsks_flutter/ui/todos/providers/todo_form/todo_form_notifier.dart';
+import 'package:tsks_flutter/ui/todos/providers/todo_mover.dart';
 import 'package:tsks_flutter/ui/todos/providers/todos_provider.dart';
 import 'package:tsks_flutter/ui/todos/widgets/base_todo_tile_widget.dart';
 import 'package:tsks_flutter/ui/todos/widgets/sub_todo_list_widget.dart';
@@ -33,6 +36,14 @@ class TodoTile extends HookConsumerWidget {
         case 'edit':
           todoFormNotifier.initializeWithTodo(todo);
           await context.openTodoEditor();
+        case 'move':
+          todoFormNotifier.initializeWithTodo(todo);
+          final collectionUid = await context.openCollectionsSelector();
+          log(collectionUid.toString());
+          if (collectionUid == null) return;
+          await ref
+              .read(todoMoverProvider.notifier)
+              .moveTodoToCollection(todo, collectionUid);
         case 'delete':
           final shouldDelete = await context.showConfirmationDialog(
             title: 'Delete Todo?',
@@ -122,6 +133,13 @@ class TodoTile extends HookConsumerWidget {
           child: ListTile(
             leading: Icon(PhosphorIconsBold.pencilSimple),
             title: Text('Edit Todo'),
+          ),
+        ),
+        const PopupMenuItem<String>(
+          value: 'move',
+          child: ListTile(
+            leading: Icon(PhosphorIconsBold.folderMinus),
+            title: Text('Move Todo'),
           ),
         ),
         PopupMenuItem<String>(

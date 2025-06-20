@@ -77,15 +77,16 @@ final class TodoDto with EquatableMixin {
   ];
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-    'uid': uid,
+    'ownerUid': ownerUid,
+    'collectionUid': collectionUid,
     'title': title,
     'isDone': isDone,
     'dueDate': dueDate != null
         ? const TimestampConverter().toJson(dueDate!)
         : null,
-    'ownerUid': ownerUid,
-    'collectionUid': collectionUid,
     'parentTodoUid': parentTodoUid,
+    'createdAt': FieldValue.serverTimestamp(),
+    'updatedAt': FieldValue.serverTimestamp(),
   };
 
   Todo toDomain() {

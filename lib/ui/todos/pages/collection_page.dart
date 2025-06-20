@@ -6,8 +6,11 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:tsks_flutter/domain/core/value_objects/uid.dart';
 import 'package:tsks_flutter/routing/router_notifier.dart';
 import 'package:tsks_flutter/ui/core/ui/page_widget.dart';
+import 'package:tsks_flutter/ui/core/ui/tsks_snackbar.dart';
 import 'package:tsks_flutter/ui/todos/providers/collection_form/collection_form.dart';
 import 'package:tsks_flutter/ui/todos/providers/collection_notifier.dart';
+import 'package:tsks_flutter/ui/todos/providers/todo_mover.dart';
+import 'package:tsks_flutter/ui/todos/providers/todos_provider.dart';
 import 'package:tsks_flutter/ui/todos/widgets/todo_extensions.dart';
 import 'package:tsks_flutter/ui/todos/widgets/todo_list_widget.dart';
 
@@ -18,7 +21,24 @@ class CollectionPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen(todoMoverProvider, (previous, next) {
+      if (previous == next) return;
+      switch (next) {
+        case AsyncError(:final error):
+          context.showErrorSnackBar(error.toString());
+        case AsyncData(:final value):
+          if (value == null) return;
+          ref.read(todosProvider(uid).notifier).optimisticallyDelete(value);
+          context.showSuccessSnackBar('Todo moved successfully.');
+      }
+    });
+
     final isMobile = ResponsiveBreakpoints.of(context).smallerThan(TABLET);
+
+    final isTodoMoveInProgress = ref.watch(
+      todoMoverProvider.select((selector) => selector.isLoading),
+    );
+
     return Scaffold(
       appBar: isMobile ? const _AppBar(key: Key('CollectionPageAppBar')) : null,
       body: SingleChildScrollView(
@@ -48,7 +68,10 @@ class CollectionPage extends ConsumerWidget {
                 ),
               ],
               const SizedBox(height: 40),
-              const TodoListWidget(),
+              if (isTodoMoveInProgress)
+                const Skeletonizer(child: TodoListWidget())
+              else
+                const TodoListWidget(),
             ],
           ),
         ),

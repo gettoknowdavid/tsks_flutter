@@ -234,41 +234,37 @@ final class TodosRepository {
     }
   }
 
-  // In your TodosRepository class
-
   /// Moves a top-level todo to a different collection.
-  Future<Either<TsksException, Unit>> moveTodoToCollection({
-    required Todo todoToMove,
-    required Uid newCollectionUid,
-  }) async {
+  Future<Either<TsksException, Todo>> moveTodoToCollection(
+    Todo todo,
+    Uid collectionUid,
+  ) async {
     try {
-      // 1. Define references to the old and new locations.
-      final oldDocRef = _todoReference(
-        todoToMove.collectionUid,
-      ).doc(todoToMove.uid.getOrCrash);
-      final newDocRef = _todoReference(
-        newCollectionUid,
-      ).doc(todoToMove.uid.getOrCrash);
+      final todoUid = todo.uid.getOrCrash;
+      // Define references to the old location
+      final oldReference = _todoReference(todo.collectionUid).doc(todoUid);
 
-      // 2. Create the new data object with the updated collection Uid.
-      final newTodoData = TodoDto.fromDomain(
-        todoToMove,
-      ).copyWith(collectionUid: newCollectionUid.getOrCrash).toJson();
+      // Define references to the new location
+      final newReference = _todoReference(collectionUid).doc(todoUid);
 
-      // 3. Run the move as an atomic transaction.
+      // Create the new data object with the updated collection Uid.
+      final newTodo = todo.copyWith(collectionUid: collectionUid);
+      final newTodoData = TodoDto.fromDomain(newTodo).toJson();
+
+      // Run the move as an atomic transaction.
       await _firestore.runTransaction((transaction) async {
         // We get the old doc first to ensure it still exists.
-        final oldDocSnapshot = await transaction.get(oldDocRef);
+        final oldDocSnapshot = await transaction.get(oldReference);
         if (!oldDocSnapshot.exists) {
           throw const NoTodoFoundException();
         }
 
         // Create the new document and delete the old one.
-        transaction.set(newDocRef, newTodoData);
-        transaction.delete(oldDocRef);
+        transaction.set(newReference, newTodoData);
+        transaction.delete(oldReference);
       });
 
-      return const Right(unit);
+      return Right(newTodo);
     } on TimeoutException {
       return const Left(TsksTimeoutException());
     } on Exception catch (e) {

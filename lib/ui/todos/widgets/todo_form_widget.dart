@@ -19,7 +19,6 @@ class TodoFormWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(GlobalKey<FormState>.new);
     final status = ref.watch(todoFormProvider.select((s) => s.status));
-    final parentTodo = ref.watch(todoFormProvider.select((s) => s.parentTodo));
 
     ref.listen(todoFormProvider, (previous, next) {
       if (previous?.status == next.status) return;
@@ -60,9 +59,7 @@ class TodoFormWidget extends HookConsumerWidget {
                 children: [
                   _CollectionField(key: Key('todoForm_collectionField')),
                   Expanded(
-                    child: _DateField(
-                      key: Key('todoForm_collectionDueDate'),
-                    ),
+                    child: _DateField(key: Key('todoForm_collectionDueDate')),
                   ),
                 ],
               ),

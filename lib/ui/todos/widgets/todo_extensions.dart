@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_framework.dart';
+import 'package:tsks_flutter/domain/core/value_objects/uid.dart';
 import 'package:tsks_flutter/domain/models/todos/todo.dart';
 import 'package:tsks_flutter/ui/todos/widgets/collection_form_widget.dart';
+import 'package:tsks_flutter/ui/todos/widgets/collection_list_widget.dart';
 import 'package:tsks_flutter/ui/todos/widgets/todo_form_widget.dart';
 
 extension TodoExtensions on BuildContext {
@@ -152,5 +154,39 @@ extension TodoExtensions on BuildContext {
         ),
       ),
     );
+  }
+
+  Future<Uid?> openCollectionsSelector() {
+    final isMobile = ResponsiveBreakpoints.of(this).smallerThan(TABLET);
+
+    if (isMobile) {
+      return showModalBottomSheet<Uid>(
+        context: this,
+        useRootNavigator: true,
+        isScrollControlled: true,
+        isDismissible: false,
+        builder: (context) => Padding(
+          padding: MediaQuery.viewInsetsOf(context),
+          child: CollectionListWidget(
+            onCollectionSelected: (uid) => Navigator.pop(context, uid),
+          ),
+        ),
+      );
+    } else {
+      return showDialog<Uid>(
+        context: this,
+        barrierDismissible: false,
+        builder: (context) => MaxWidthBox(
+          maxWidth: 560,
+          child: Dialog(
+            alignment: Alignment.topCenter,
+            insetPadding: const EdgeInsets.fromLTRB(40, 160, 40, 0),
+            child: CollectionListWidget(
+              onCollectionSelected: (uid) => Navigator.pop(context, uid),
+            ),
+          ),
+        ),
+      );
+    }
   }
 }

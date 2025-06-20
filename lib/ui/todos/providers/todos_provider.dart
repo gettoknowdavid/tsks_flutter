@@ -50,17 +50,24 @@ class Todos extends _$Todos {
     );
   }
 
+  void optimisticallyDelete(Todo todo) {
+    state.whenData((todos) {
+      if (todos.isEmpty) return;
+      final index = todos.indexWhere((t) => todo.uid == t?.uid);
+      if (index != -1) {
+        final updatedTodos = todos.where((t) => todo.uid != t?.uid).toList();
+        state = AsyncData(updatedTodos);
+      } else {
+        return;
+      }
+    });
+  }
+
   Future<void> deleteTodo(Todo todo) async {
     final todos = state.valueOrNull;
     if (todos == null || todos.isEmpty) return;
 
-    final index = todos.indexWhere((t) => todo.uid == t?.uid);
-    if (index != -1) {
-      final updatedTodos = todos.where((t) => todo.uid != t?.uid).toList();
-      state = AsyncData(updatedTodos);
-    } else {
-      return;
-    }
+    optimisticallyDelete(todo);
 
     final repository = ref.read(todosRepositoryProvider);
     final response = await repository.deleteTodo(todo);

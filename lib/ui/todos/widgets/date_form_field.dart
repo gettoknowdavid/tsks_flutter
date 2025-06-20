@@ -53,10 +53,7 @@ class _DateField extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TextFormField(
-            decoration: InputDecoration(
-              helperText: 'Due Date',
-              hintText: formattedDate,
-            ),
+            decoration: InputDecoration(hintText: formattedDate),
             enabled: enabled,
             readOnly: true,
             style: theme.textTheme.labelLarge,

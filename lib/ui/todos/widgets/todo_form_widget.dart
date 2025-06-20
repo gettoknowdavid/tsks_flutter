@@ -187,7 +187,6 @@ class CollectionDropdownWidget extends StatelessWidget {
         value: value,
         decoration: InputDecoration(
           hintText: 'Pick a Collection',
-          helperText: 'Collection',
           constraints: const BoxConstraints(maxWidth: 190),
           contentPadding: const EdgeInsetsGeometry.fromLTRB(22, 18, 22, 18),
           enabled: enabled,

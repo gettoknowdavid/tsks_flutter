@@ -138,7 +138,7 @@ class _CollectionField extends HookConsumerWidget {
       items: _items(collections),
       value: selectedCollectionUid,
       onChanged: ref.read(todoFormProvider.notifier).collectionChanged,
-      enabled: !status.isLoading,
+      enabled: pathUid == null && !status.isLoading,
       validator: (_) => colUid.value.fold(
         (_) => 'Collection required',
         (_) => null,

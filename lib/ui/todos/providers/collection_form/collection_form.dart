@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fpdart/fpdart.dart';
@@ -59,10 +60,16 @@ class CollectionForm extends _$CollectionForm {
         // Compare each proper from the state with that from the
         // initial collection, and if a field matches, add that field to the
         // `dataToUpdate` map
-        if (!const DeepCollectionEquality().equals(value, initialData[key])) {
+        // Exclude 'createdAt' and 'updatedAt' from this comparison as
+        // Firebase manages them.
+        if (key != 'createdAt' &&
+            key != 'updatedAt' &&
+            !const DeepCollectionEquality().equals(value, initialData[key])) {
           dataToUpdate[key] = value;
         }
       });
+
+      dataToUpdate['updatedAt'] = FieldValue.serverTimestamp();
 
       response = await repository.updateCollection(
         uid: initialCollection.uid,
@@ -74,7 +81,6 @@ class CollectionForm extends _$CollectionForm {
         colorARGB: state.color?.toARGB32(),
         iconMap: state.iconMap,
         isFavourite: state.isFavourite,
-        createdAt: state.createdAt,
       );
     }
 

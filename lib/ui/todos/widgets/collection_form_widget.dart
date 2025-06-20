@@ -19,9 +19,6 @@ class CollectionFormWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(GlobalKey<FormState>.new);
     final status = ref.watch(collectionFormProvider.select((s) => s.status));
-    final initialCollection = ref.watch(
-      collectionFormProvider.select((s) => s.initialCollection),
-    );
 
     ref.listen(collectionFormProvider, (previous, next) {
       if (previous?.status == next.status) return;
@@ -33,14 +30,12 @@ class CollectionFormWidget extends HookConsumerWidget {
           context.showErrorSnackBar(next.exception?.message);
         case CollectionFormStatus.success:
           final newOrUpdatedCollection = next.newCollection;
-          if (initialCollection != null && newOrUpdatedCollection != null) {
+          if (newOrUpdatedCollection != null) {
             // Optimistically update the current collection
-            final uid = initialCollection.uid;
+            final uid = newOrUpdatedCollection.uid;
             final notifier = ref.read(collectionNotifierProvider(uid).notifier);
             notifier.optimisticallyUpdate(newOrUpdatedCollection);
-          }
 
-          if (initialCollection == null && newOrUpdatedCollection != null) {
             // Optimistically update the collections list
             final colsNotifier = ref.read(allCollectionsProvider.notifier);
             colsNotifier.optimisticallyUpdate(newOrUpdatedCollection);
@@ -76,9 +71,7 @@ class CollectionFormWidget extends HookConsumerWidget {
               Row(
                 spacing: 16,
                 children: [
-                  const _SubmitButton(
-                    key: Key('collectionForm_submitButton'),
-                  ),
+                  const _SubmitButton(key: Key('collectionForm_submitButton')),
                   CancelButton(enabled: !status.isLoading),
                 ],
               ),

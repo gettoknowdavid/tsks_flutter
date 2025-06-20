@@ -43,7 +43,6 @@ extension TodoExtensions on BuildContext {
       await showModalBottomSheet<void>(
         context: this,
         useRootNavigator: true,
-        isScrollControlled: true,
         isDismissible: false,
         builder: (context) => Padding(
           padding: MediaQuery.viewInsetsOf(context),

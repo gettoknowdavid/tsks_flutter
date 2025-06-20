@@ -15,15 +15,22 @@ class TodoListWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerConfigProvider);
     final uidString = router.state.pathParameters['uid'];
+
     final collectionUid = uidString != null ? Uid(uidString) : null;
     final todos = ref.watch(todosProvider(collectionUid));
 
-    return switch (todos) {
-      AsyncLoading() => TodoListBuilder(fakeTodos, isLoading: true),
-      AsyncData(:final value) => TodoListBuilder(value),
-      AsyncError(:final error) => Text(error.toString()),
-      _ => const SizedBox.shrink(),
-    };
+    return Column(
+      children: [
+        Text('Todos - '),
+        const SizedBox(height: 4),
+        switch (todos) {
+          AsyncLoading() => TodoListBuilder(fakeTodos, isLoading: true),
+          AsyncData(:final value) => TodoListBuilder(value),
+          AsyncError(:final error) => Text(error.toString()),
+          _ => const SizedBox.shrink(),
+        },
+      ],
+    );
   }
 }
 

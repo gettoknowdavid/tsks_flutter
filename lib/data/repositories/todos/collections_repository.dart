@@ -5,7 +5,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:tsks_flutter/data/dtos/timestamp_converter.dart';
 import 'package:tsks_flutter/data/services/cloud_firestore.dart';
 import 'package:tsks_flutter/domain/core/exceptions/tsks_exception.dart';
 import 'package:tsks_flutter/domain/core/value_objects/value_objects.dart';
@@ -17,37 +16,37 @@ part 'collections_repository.g.dart';
 
 @riverpod
 CollectionsRepository collectionsRepository(Ref ref) {
-  final userDocRef = ref.read(userDocumentReferenceProvider);
-  return CollectionsRepository(userDocRef: userDocRef);
+  final userDocumentReference = ref.read(userDocumentReferenceProvider);
+  return CollectionsRepository(userDocumentReference: userDocumentReference);
 }
 
 final class CollectionsRepository {
   const CollectionsRepository({
-    required DocumentReference<User> userDocRef,
-  }) : _userDocRef = userDocRef;
+    required DocumentReference<User> userDocumentReference,
+  }) : _userDocumentReference = userDocumentReference;
 
-  final DocumentReference<User> _userDocRef;
+  final DocumentReference<User> _userDocumentReference;
 
   CollectionReference<Map<String, dynamic>> get _collectionRef {
-    return _userDocRef.collection('collections');
+    return _userDocumentReference.collection('collections');
   }
 
   Future<Either<TsksException, Collection>> createCollection({
     required SingleLineString title,
-    required DateTime createdAt,
     bool? isFavourite = false,
     int? colorARGB,
     Map<String, dynamic>? iconMap,
   }) async {
     try {
-      log(_userDocRef.id);
+      log(_userDocumentReference.id);
       final documentReference = await _collectionRef.add({
-        'ownerUid': _userDocRef.id,
+        'ownerUid': _userDocumentReference.id,
         'title': title.getOrCrash,
         'isFavourite': isFavourite ?? false,
         'colorARGB': colorARGB,
         'iconMap': iconMap,
-        'createdAt': const TimestampConverter().toJson(createdAt),
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
       });
 
       final snapshot = await documentReference.collectionConverter.get();
@@ -74,7 +73,7 @@ final class CollectionsRepository {
     try {
       final documentReference = _collectionRef.doc(uid.getOrCrash);
 
-      await _collectionRef.doc(uid.getOrCrash).update(data);
+      await documentReference.update(data);
 
       final snapshot = await documentReference.collectionConverter.get();
       final collectionDto = snapshot.data();
@@ -105,7 +104,7 @@ final class CollectionsRepository {
   Future<Either<TsksException, List<Collection?>>> getCollections() async {
     try {
       final querySnapshot = await _collectionRef.collectionConverter
-          .orderBy('createdAt', descending: true)
+          .orderBy('updatedAt', descending: true)
           .get();
 
       final collections = querySnapshot.docs

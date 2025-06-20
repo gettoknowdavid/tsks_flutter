@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fpdart/fpdart.dart';
@@ -59,7 +58,6 @@ final class TodosRepository {
   Future<Either<TsksException, Todo>> createTodo({
     required Uid collectionUid,
     required SingleLineString title,
-    required DateTime createdAt,
     bool? isDone = false,
     DateTime? dueDate,
     Uid? parentTodoUid,
@@ -69,15 +67,14 @@ final class TodosRepository {
         'ownerUid': _userDocumentReference.id,
         'collectionUid': collectionUid.getOrCrash,
         'title': title.getOrCrash,
-        'createdAt': const TimestampConverter().toJson(createdAt),
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
         'isDone': isDone,
         'dueDate': dueDate != null
             ? const TimestampConverter().toJson(dueDate)
             : null,
         'parentTodoUid': parentTodoUid?.getOrNull,
       };
-
-      log(data.toString());
 
       DocumentReference<Map<String, dynamic>> documentReference;
 
@@ -107,7 +104,7 @@ final class TodosRepository {
       final parentTodoUid = todo.parentTodoUid;
       final updatePayload = {
         'isDone': todo.isDone,
-        'updatedAt': const TimestampConverter().toJson(DateTime.now()),
+        'updatedAt': FieldValue.serverTimestamp(),
       };
       if (parentTodoUid != null) {
         await _subTodoReference(
@@ -147,11 +144,6 @@ final class TodosRepository {
           parentTodoUid: parentTodoUid,
         ).doc(uidStr);
       }
-
-      final updatedAt = const TimestampConverter().toJson(DateTime.now());
-      data['updatedAt'] = updatedAt;
-
-      log('DATA FOR UID($uidStr): $data');
 
       await documentReference.update(data);
       final snapshot = await documentReference.todoConverter.get();
@@ -206,7 +198,7 @@ final class TodosRepository {
     try {
       final querySnapshot = await _todoReference(
         collectionUid,
-      ).todoConverter.get();
+      ).todoConverter.orderBy('updatedAt', descending: true).get();
 
       final todos = querySnapshot.docs
           .map((snapshot) => snapshot.data()?.toDomain())

@@ -83,10 +83,6 @@ final class TodoDto with EquatableMixin {
     'dueDate': dueDate != null
         ? const TimestampConverter().toJson(dueDate!)
         : null,
-    'createdAt': const TimestampConverter().toJson(createdAt),
-    'updatedAt': updatedAt != null
-        ? const TimestampConverter().toJson(updatedAt!)
-        : null,
     'ownerUid': ownerUid,
     'collectionUid': collectionUid,
     'parentTodoUid': parentTodoUid,

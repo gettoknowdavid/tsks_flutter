@@ -74,10 +74,6 @@ final class CollectionDto with EquatableMixin {
     'isFavourite': isFavourite,
     'colorARGB': colorARGB,
     'iconMap': iconMap,
-    'createdAt': const TimestampConverter().toJson(createdAt),
-    'updatedAt': updatedAt != null
-        ? const TimestampConverter().toJson(updatedAt!)
-        : null,
   };
 
   Collection toDomain() {

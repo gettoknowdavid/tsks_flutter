@@ -64,6 +64,10 @@ class TodoTile extends HookConsumerWidget {
       children: [
         BaseTodoListTile(
           todo: todo,
+          onLongPress: () async {
+            final choice = await _optionsMenu(context, isSubTodo: isSubTodo);
+            if (choice != null) await handleMenuSelection(choice);
+          },
           onSecondaryTapDown: (details) => _showContextMenu(
             context,
             details,
@@ -98,8 +102,6 @@ class TodoTile extends HookConsumerWidget {
     void Function(String) onSelected, {
     bool isSubTodo = false,
   }) async {
-    final colors = Theme.of(context).colorScheme;
-
     final globalPosition = details.globalPosition;
     final position = RelativeRect.fromLTRB(
       globalPosition.dx,
@@ -108,7 +110,21 @@ class TodoTile extends HookConsumerWidget {
       globalPosition.dy,
     );
 
-    final choice = await showMenu<String>(
+    final choice = await _optionsMenu(
+      context,
+      isSubTodo: isSubTodo,
+      position: position,
+    );
+    if (choice != null) onSelected(choice);
+  }
+
+  Future<String?> _optionsMenu(
+    BuildContext context, {
+    RelativeRect? position,
+    bool isSubTodo = false,
+  }) async {
+    final colors = Theme.of(context).colorScheme;
+    return showMenu<String>(
       context: context,
       position: position,
       useRootNavigator: true,
@@ -150,6 +166,5 @@ class TodoTile extends HookConsumerWidget {
         ),
       ],
     );
-    if (choice != null) onSelected(choice);
   }
 }

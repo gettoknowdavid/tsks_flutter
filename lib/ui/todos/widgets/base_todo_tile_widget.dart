@@ -16,12 +16,14 @@ class BaseTodoListTile extends ConsumerWidget {
     super.key,
     this.trailing,
     this.onSecondaryTapDown,
+    this.onLongPress,
   });
 
   final Todo todo;
   final EdgeInsetsGeometry padding;
   final Widget? trailing;
   final void Function(TapDownDetails)? onSecondaryTapDown;
+  final void Function()? onLongPress;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -50,6 +52,7 @@ class BaseTodoListTile extends ConsumerWidget {
       child: InkWell(
         borderRadius: const BorderRadius.all(Radius.circular(18)),
         onSecondaryTapDown: onSecondaryTapDown,
+        onLongPress: onLongPress,
         onTap: () {
           todoFormNotifier.initializeWithTodo(todo);
           context.openTodoEditor();

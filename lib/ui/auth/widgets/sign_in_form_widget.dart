@@ -3,7 +3,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:tsks_flutter/ui/auth/providers/sign_in/sign_in_notifier.dart';
+import 'package:tsks_flutter/ui/core/models/models.dart';
 import 'package:tsks_flutter/ui/core/ui/tsks_snackbar.dart';
+import 'package:tsks_flutter/ui/core/ui/ui.dart' show TinyLoadingIndicator;
 
 class SignInFormWidget extends HookConsumerWidget {
   const SignInFormWidget({super.key});
@@ -14,12 +16,8 @@ class SignInFormWidget extends HookConsumerWidget {
 
     ref.listen(signInNotifierProvider, (previous, next) {
       if (previous?.status == next.status) return;
-      switch (next.status) {
-        case SignInStatus.failure:
-          context.showErrorSnackBar(next.exception?.message);
-        case SignInStatus.success:
-        case SignInStatus.initial:
-        case SignInStatus.loading:
+      if (next.status.isFailure || next.exception != null) {
+        context.showErrorSnackBar(next.exception?.message);
       }
     });
 
@@ -42,6 +40,7 @@ class SignInFormWidget extends HookConsumerWidget {
 
 class _EmailField extends HookConsumerWidget {
   const _EmailField({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final email = ref.watch(signInNotifierProvider.select((s) => s.email));
@@ -50,8 +49,8 @@ class _EmailField extends HookConsumerWidget {
       keyboardType: TextInputType.emailAddress,
       decoration: const InputDecoration(hintText: 'Email'),
       onChanged: ref.read(signInNotifierProvider.notifier).emailChanged,
-      validator: (value) => email.failureOrNull?.message,
-      enabled: !status.isLoading,
+      validator: (value) => email.error?.message,
+      enabled: !status.isInProgress,
       onFieldSubmitted: (value) async {
         if (Form.of(context).validate()) {
           await ref.read(signInNotifierProvider.notifier).signIn();
@@ -63,6 +62,7 @@ class _EmailField extends HookConsumerWidget {
 
 class _PasswordField extends HookConsumerWidget {
   const _PasswordField({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final password = ref.watch(
@@ -76,8 +76,8 @@ class _PasswordField extends HookConsumerWidget {
 
     return TextFormField(
       onChanged: ref.read(signInNotifierProvider.notifier).passwordChanged,
-      validator: (value) => password.failureOrNull?.message,
-      enabled: !status.isLoading,
+      validator: (value) => password.error?.message,
+      enabled: !status.isInProgress,
       obscureText: isHidden.value,
       textInputAction: TextInputAction.go,
       onFieldSubmitted: (value) async {
@@ -107,8 +107,8 @@ class _SignInButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isLoading = ref.watch(
-      signInNotifierProvider.select((s) => s.status.isLoading),
+    final isInProgress = ref.watch(
+      signInNotifierProvider.select((s) => s.status.isInProgress),
     );
 
     Future<void> signIn() async {
@@ -118,22 +118,10 @@ class _SignInButton extends ConsumerWidget {
     }
 
     return FilledButton(
-      onPressed: isLoading ? null : signIn,
-      child: isLoading ? const TinyLoadingIndicator() : const Text('Sign in'),
-    );
-  }
-}
-
-class TinyLoadingIndicator extends StatelessWidget {
-  const TinyLoadingIndicator({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: SizedBox.square(
-        dimension: 20,
-        child: CircularProgressIndicator(),
-      ),
+      onPressed: isInProgress ? null : signIn,
+      child: isInProgress
+          ? const TinyLoadingIndicator()
+          : const Text('Sign in'),
     );
   }
 }

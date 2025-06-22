@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:tsks_flutter/ui/auth/providers/sign_up/sign_up_notifier.dart';
+import 'package:tsks_flutter/ui/core/models/models.dart';
 import 'package:tsks_flutter/ui/core/ui/ui.dart';
 
 class SignUpFormWidget extends HookConsumerWidget {
@@ -14,12 +15,8 @@ class SignUpFormWidget extends HookConsumerWidget {
 
     ref.listen(signUpNotifierProvider, (previous, next) {
       if (previous?.status == next.status) return;
-      switch (next.status) {
-        case SignUpStatus.failure:
-          context.showErrorSnackBar(next.exception?.message);
-        case SignUpStatus.success:
-        case SignUpStatus.initial:
-        case SignUpStatus.loading:
+      if (next.status.isFailure || next.exception != null) {
+        context.showErrorSnackBar(next.exception?.message);
       }
     });
 
@@ -44,6 +41,7 @@ class SignUpFormWidget extends HookConsumerWidget {
 
 class _FullNameField extends HookConsumerWidget {
   const _FullNameField({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final fullName = ref.watch(
@@ -53,8 +51,8 @@ class _FullNameField extends HookConsumerWidget {
     return TextFormField(
       decoration: const InputDecoration(hintText: 'Full Name'),
       onChanged: ref.read(signUpNotifierProvider.notifier).fullNameChanged,
-      validator: (value) => fullName.failureOrNull?.message,
-      enabled: status != SignUpStatus.loading,
+      validator: (value) => fullName.error?.message,
+      enabled: !status.isInProgress,
       onFieldSubmitted: (value) async {
         if (Form.of(context).validate()) {
           await ref.read(signUpNotifierProvider.notifier).signUp();
@@ -66,6 +64,7 @@ class _FullNameField extends HookConsumerWidget {
 
 class _EmailField extends HookConsumerWidget {
   const _EmailField({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final email = ref.watch(signUpNotifierProvider.select((s) => s.email));
@@ -73,9 +72,9 @@ class _EmailField extends HookConsumerWidget {
     return TextFormField(
       decoration: const InputDecoration(hintText: 'Email'),
       onChanged: ref.read(signUpNotifierProvider.notifier).emailChanged,
-      validator: (value) => email.failureOrNull?.message,
+      validator: (value) => email.error?.message,
       keyboardType: TextInputType.emailAddress,
-      enabled: status != SignUpStatus.loading,
+      enabled: !status.isInProgress,
       onFieldSubmitted: (value) async {
         if (Form.of(context).validate()) {
           await ref.read(signUpNotifierProvider.notifier).signUp();
@@ -87,6 +86,7 @@ class _EmailField extends HookConsumerWidget {
 
 class _PasswordField extends HookConsumerWidget {
   const _PasswordField({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final password = ref.watch(
@@ -100,8 +100,8 @@ class _PasswordField extends HookConsumerWidget {
 
     return TextFormField(
       onChanged: ref.read(signUpNotifierProvider.notifier).passwordChanged,
-      validator: (value) => password.failureOrNull?.message,
-      enabled: status != SignUpStatus.loading,
+      validator: (value) => password.error?.message,
+      enabled: !status.isInProgress,
       obscureText: isHidden.value,
       onFieldSubmitted: (value) async {
         if (Form.of(context).validate()) {
@@ -130,8 +130,8 @@ class _SignUpButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isLoading = ref.watch(
-      signUpNotifierProvider.select((s) => s.status.isLoading),
+    final isInProgress = ref.watch(
+      signUpNotifierProvider.select((s) => s.status.isInProgress),
     );
 
     Future<void> signUp() async {
@@ -141,8 +141,10 @@ class _SignUpButton extends ConsumerWidget {
     }
 
     return FilledButton(
-      onPressed: isLoading ? null : signUp,
-      child: isLoading ? const TinyLoadingIndicator() : const Text('Sign up'),
+      onPressed: isInProgress ? null : signUp,
+      child: isInProgress
+          ? const TinyLoadingIndicator()
+          : const Text('Sign up'),
     );
   }
 }

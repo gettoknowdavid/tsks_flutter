@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:responsive_framework/responsive_framework.dart';
-import 'package:tsks_flutter/routing/router_notifier.dart';
+import 'package:tsks_flutter/routing/router.dart';
 import 'package:tsks_flutter/ui/auth/widgets/widgets.dart';
 
 class SignUpPage extends StatelessWidget {
@@ -12,7 +12,7 @@ class SignUpPage extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final textTheme = theme.textTheme;
-    
+
     return Scaffold(
       body: MaxWidthBox(
         maxWidth: 420,

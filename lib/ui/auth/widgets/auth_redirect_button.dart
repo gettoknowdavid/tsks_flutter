@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tsks_flutter/routing/router_notifier.dart';
+import 'package:tsks_flutter/routing/router.dart';
 
 class AuthRedirectButton extends StatelessWidget {
   const AuthRedirectButton({super.key});

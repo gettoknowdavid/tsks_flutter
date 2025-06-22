@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:tsks_flutter/ui/auth/providers/session/session.dart';
+import 'package:tsks_flutter/ui/auth/providers/session.dart';
 
 class SignOutButton extends ConsumerWidget {
   const SignOutButton({super.key});

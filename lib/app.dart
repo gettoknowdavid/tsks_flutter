@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:responsive_framework/responsive_framework.dart';
-import 'package:tsks_flutter/routing/router_notifier.dart';
-import 'package:tsks_flutter/ui/auth/providers/auth_repository_provider.dart';
-import 'package:tsks_flutter/ui/auth/providers/session/session.dart';
+import 'package:tsks_flutter/data/repositories/auth/auth_repository.dart';
+import 'package:tsks_flutter/routing/routing.dart';
+import 'package:tsks_flutter/ui/auth/providers/session.dart';
 import 'package:tsks_flutter/ui/core/themes/themes.dart';
 import 'package:tsks_flutter/ui/core/ui/ui.dart' show TsksCustomScrollBehavior;
 
@@ -14,7 +14,7 @@ class TsksApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(userChangesProvider);
     ref.watch(sessionProvider);
-    ref.watch(tsksRouterProvider);
+    ref.watch(tsksRouterNotifierProvider);
     ref.watch(routerConfigProvider);
     return const TsksAppView();
   }
@@ -27,9 +27,7 @@ class TsksAppView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final routerConfig = ref.watch(routerConfigProvider);
     return MaterialApp.router(
-      routeInformationParser: routerConfig.routeInformationParser,
-      routerDelegate: routerConfig.routerDelegate,
-      routeInformationProvider: routerConfig.routeInformationProvider,
+      routerConfig: routerConfig,
       theme: TsksTheme.lightTheme,
       darkTheme: TsksTheme.darkTheme,
       debugShowCheckedModeBanner: false,

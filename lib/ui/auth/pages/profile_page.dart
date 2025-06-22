@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:tsks_flutter/domain/models/auth/user.dart';
-import 'package:tsks_flutter/ui/auth/providers/auth_repository_provider.dart';
-import 'package:tsks_flutter/ui/auth/providers/session/session.dart';
+import 'package:tsks_flutter/data/repositories/auth/auth_repository.dart';
+import 'package:tsks_flutter/models/auth/user.dart';
+import 'package:tsks_flutter/ui/auth/providers/session.dart';
 import 'package:tsks_flutter/ui/auth/widgets/profile_list_tile.dart';
 import 'package:tsks_flutter/ui/auth/widgets/sign_out_button.dart';
-import 'package:tsks_flutter/ui/core/ui/page_widget.dart';
-import 'package:tsks_flutter/ui/core/ui/user_avatar.dart';
+import 'package:tsks_flutter/ui/core/ui/ui.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
@@ -26,6 +25,7 @@ class ProfilePage extends ConsumerWidget {
 
 class ProfileView extends StatelessWidget {
   const ProfileView({this.isLoading = false, super.key});
+
   final bool isLoading;
 
   @override
@@ -75,7 +75,7 @@ class _UserWidget extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                user?.fullName.getOrNull ?? '',
+                user?.fullName ?? '',
                 style: textTheme.headlineMedium,
               ),
               Skeleton.shade(
@@ -116,13 +116,13 @@ class _DetailsSection extends ConsumerWidget {
         children: [
           ProfileListTile(
             overline: 'Display Name',
-            title: user?.fullName.getOrNull ?? '',
+            title: user?.fullName ?? '',
             actionButtonTitle: 'Edit',
             onActionButtonPressed: () {},
           ),
           ProfileListTile(
             overline: 'Email',
-            title: user?.email.getOrNull ?? '',
+            title: user?.email ?? '',
             actionButtonTitle: 'Edit',
             onActionButtonPressed: () {},
           ),
@@ -152,10 +152,7 @@ class _SubscriptionSection extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 16,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             child: ProfileListTile(
               overline: 'Subscription',
               title: 'Tsks Free',

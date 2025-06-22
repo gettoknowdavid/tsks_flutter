@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:tsks_flutter/ui/core/models/destination.dart';
-import 'package:tsks_flutter/ui/todos/widgets/todo_extensions.dart';
+import 'package:tsks_flutter/ui/core/ui/add_task_button.dart';
 
 class TsksBottomNavigationBar extends StatelessWidget {
   const TsksBottomNavigationBar({
@@ -30,7 +30,7 @@ class TsksBottomNavigationBar extends StatelessWidget {
 
     for (var i = 0; i < destinationsLength; i++) {
       if (i == 2) {
-        tiles.add(const Center(child: TaskerAddButton()));
+        tiles.add(const Center(child: AddTaskButton()));
       }
 
       tiles.add(
@@ -42,32 +42,5 @@ class TsksBottomNavigationBar extends StatelessWidget {
     }
 
     return tiles;
-  }
-}
-
-class TaskerAddButton extends StatelessWidget {
-  const TaskerAddButton({super.key, this.onPressed});
-
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final decoration = ShapeDecoration(
-      color: colors.primary,
-      shape: const RoundedSuperellipseBorder(
-        borderRadius: BorderRadiusGeometry.all(Radius.circular(16)),
-      ),
-    );
-    return IconButton(
-      onPressed: onPressed ?? context.openTodoEditor,
-      style: IconButton.styleFrom(fixedSize: const Size.square(70)),
-      icon: Ink(
-        decoration: decoration,
-        width: 56,
-        height: 56,
-        child: Icon(Icons.add, color: colors.onPrimary),
-      ),
-    );
   }
 }

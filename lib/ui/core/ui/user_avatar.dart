@@ -2,9 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:tsks_flutter/domain/models/auth/user.dart';
-import 'package:tsks_flutter/routing/router_notifier.dart';
-import 'package:tsks_flutter/ui/auth/providers/session/session.dart';
+import 'package:tsks_flutter/models/auth/user.dart';
+import 'package:tsks_flutter/routing/router.dart';
+import 'package:tsks_flutter/ui/auth/providers/session.dart';
 
 class UserAvatar extends ConsumerWidget {
   const UserAvatar({this.radius = 20, super.key});

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:tsks_flutter/routing/router_notifier.dart';
+import 'package:tsks_flutter/routing/router.dart';
 import 'package:tsks_flutter/ui/core/models/destination.dart';
 
 class TsksAppBarNavigationList extends ConsumerWidget {

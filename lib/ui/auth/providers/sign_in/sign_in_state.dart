@@ -1,64 +1,56 @@
 part of 'sign_in_notifier.dart';
 
-final class SignInState with EquatableMixin {
-  SignInState() : this._(email: Email(''), password: Password(''));
+final class SignInState with FormzMixin, EquatableMixin {
+  const SignInState() : this._();
 
   const SignInState._({
-    required this.email,
-    required this.password,
-    this.status = SignInStatus.initial,
+    this.email = const Email.pure(),
+    this.password = const Password.pure(),
+    this.status = Status.initial,
     this.exception,
   });
 
   final Email email;
   final Password password;
-  final SignInStatus status;
+  final Status status;
   final TsksException? exception;
 
-  @override
-  List<Object?> get props => [email, password, status, exception];
-
   SignInState withEmail(String email) {
-    return SignInState._(email: Email(email), password: password);
+    return SignInState._(email: Email.dirty(email), password: password);
   }
 
-  SignInState withFailure(TsksException exception) {
+  SignInState withPassword(String password) {
+    return SignInState._(email: email, password: Password.dirty(password));
+  }
+
+  SignInState withSubmissionInProgress() {
     return SignInState._(
       email: email,
       password: password,
-      status: SignInStatus.failure,
+      status: Status.inProgress,
+    );
+  }
+
+  SignInState withSubmissionFailure(TsksException exception) {
+    return SignInState._(
+      email: email,
+      password: password,
+      status: Status.failure,
       exception: exception,
     );
   }
 
-  SignInState withLoading() {
+  SignInState withSubmissionSuccess(dynamic unit) {
     return SignInState._(
       email: email,
       password: password,
-      status: SignInStatus.loading,
+      status: Status.success,
     );
   }
 
-  SignInState withPassword(String password) {
-    return SignInState._(email: email, password: Password(password));
-  }
+  @override
+  List<FormzInput<dynamic, dynamic>> get inputs => [email, password];
 
-  SignInState withSuccess(dynamic unit) {
-    return SignInState._(
-      email: email,
-      password: password,
-      status: SignInStatus.success,
-    );
-  }
-
-  bool get isFormValid => email.isValid && password.isValid;
-}
-
-enum SignInStatus { initial, loading, success, failure }
-
-extension SignUpStatusX on SignInStatus {
-  bool get isInitial => this == SignInStatus.initial;
-  bool get isLoading => this == SignInStatus.loading;
-  bool get isSuccess => this == SignInStatus.success;
-  bool get isFailure => this == SignInStatus.failure;
+  @override
+  List<Object?> get props => [email, password, status, exception];
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:responsive_framework/responsive_framework.dart';
-import 'package:tsks_flutter/routing/router_notifier.dart';
+import 'package:tsks_flutter/routing/router.dart';
 
 class PageWidget extends StatelessWidget {
   const PageWidget({

@@ -1,3 +1,5 @@
+//GENERATED BARREL FILE
+export 'add_task_button.dart';
 export 'cancel_button.dart';
 export 'landing_page.dart';
 export 'loading_page.dart';

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:tsks_flutter/routing/router_notifier.dart';
-import 'package:tsks_flutter/ui/todos/pages/pages.dart';
+import 'package:tsks_flutter/routing/router.dart';
+import 'package:tsks_flutter/ui/collections/pages/collections_page.dart';
+import 'package:tsks_flutter/ui/notifications/pages/notifications_page.dart';
+import 'package:tsks_flutter/ui/search/pages/search_page.dart';
+import 'package:tsks_flutter/ui/tasks/pages/dashboard_page.dart';
 
 class Destination {
   const Destination({

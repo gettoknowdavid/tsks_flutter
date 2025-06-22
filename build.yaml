@@ -3,7 +3,7 @@ targets:
     builders:
       go_router_builder:
         generate_for:
-          - lib/routing/router_notifier.dart
+          - lib/routing/router.dart
       json_serializable:
         generate_for:
           - lib/data/dtos/**.dart

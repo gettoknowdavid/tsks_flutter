@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_framework.dart';
+import 'package:tsks_flutter/data/exceptions/tsks_exception.dart';
 import 'package:tsks_flutter/ui/core/themes/colors.dart';
 
 typedef TMessenger = ScaffoldFeatureController<SnackBar, SnackBarClosedReason>;
@@ -53,4 +54,9 @@ extension TsksSnackbar on BuildContext {
       ),
     );
   }
+}
+
+String errorMessage(Object error) {
+  if (error is TsksException) return error.message;
+  return error.toString();
 }

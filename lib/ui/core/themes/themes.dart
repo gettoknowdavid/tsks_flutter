@@ -17,9 +17,9 @@ abstract final class TsksTheme {
       colorScheme: colorScheme,
       cardTheme: CardThemeData(
         shape: const RoundedSuperellipseBorder(
-          borderRadius: BorderRadiusGeometry.all(Radius.circular(18)),
+          borderRadius: BorderRadiusGeometry.all(Radius.circular(20)),
         ),
-        color: colorScheme.surfaceContainerHigh,
+        color: colorScheme.surfaceContainer,
         margin: EdgeInsets.zero,
         elevation: 0,
       ),

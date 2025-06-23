@@ -11,7 +11,7 @@ import 'package:tsks_flutter/ui/tasks/widgets/task_extensions.dart';
 class BaseTaskTileWidget extends ConsumerWidget {
   const BaseTaskTileWidget({
     required this.task,
-    this.padding = const EdgeInsets.all(16),
+    this.padding = const EdgeInsets.fromLTRB(16, 12, 16, 12),
     super.key,
     this.trailing,
     this.onSecondaryTapDown,
@@ -49,7 +49,7 @@ class BaseTaskTileWidget extends ConsumerWidget {
         return null;
       },
       child: InkWell(
-        borderRadius: const BorderRadius.all(Radius.circular(18)),
+        borderRadius: const BorderRadius.all(Radius.circular(20)),
         onSecondaryTapDown: onSecondaryTapDown,
         onLongPress: onLongPress,
         onTap: () {

@@ -5,7 +5,7 @@ import 'package:tsks_flutter/ui/tasks/providers/tasks_notifier.dart';
 
 part 'task_count_notifier.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class TaskCountNotifier extends _$TaskCountNotifier {
   // Use a private variable to store the initial count result
   // This will be set only once when the build method first runs

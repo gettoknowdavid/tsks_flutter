@@ -3,14 +3,14 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:tsks_flutter/constants/fake_models.dart';
 import 'package:tsks_flutter/models/collections/collection.dart';
-import 'package:tsks_flutter/ui/collections/providers/all_collections.dart';
+import 'package:tsks_flutter/ui/collections/providers/collections_notifier.dart';
 
 class CollectionDropdown extends ConsumerWidget {
   const CollectionDropdown({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final collections = ref.watch(allCollectionsProvider);
+    final collections = ref.watch(collectionsNotifierProvider);
 
     return switch (collections) {
       AsyncData(:final value) => _List(value),

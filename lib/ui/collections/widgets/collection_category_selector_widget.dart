@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:tsks_flutter/ui/collections/providers/collection_filter_notifier.dart';
+import 'package:tsks_flutter/ui/collections/providers/filtered_collections.dart';
 
 class CollectionCategorySelectorWidget extends StatelessWidget {
   const CollectionCategorySelectorWidget({super.key});
@@ -17,13 +17,19 @@ class CollectionCategorySelectorWidget extends StatelessWidget {
 
 class _FilterButton extends ConsumerWidget {
   const _FilterButton(this.filter);
+
   final CollectionFilter filter;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).colorScheme;
-    final notifier = ref.read(collectionFilterNotifierProvider.notifier);
-    final isSelected = ref.watch(collectionFilterNotifierProvider) == filter;
+
+    final notifier = ref.read(filteredCollectionsProvider.notifier);
+    final isSelected = ref.watch(
+      filteredCollectionsProvider.select(
+        (selector) => selector.filter == filter,
+      ),
+    );
 
     return Skeleton.shade(
       child: OutlinedButton(

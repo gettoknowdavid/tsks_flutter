@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tsks_flutter/constants/fake_models.dart';
 import 'package:tsks_flutter/models/collections/collection.dart';
-import 'package:tsks_flutter/ui/collections/providers/all_collections.dart';
+import 'package:tsks_flutter/ui/collections/providers/collections_notifier.dart';
 
 class CollectionListWidget extends ConsumerWidget {
   const CollectionListWidget({this.onCollectionSelected, super.key});
@@ -11,7 +11,7 @@ class CollectionListWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final collections = ref.watch(allCollectionsProvider);
+    final collections = ref.watch(collectionsNotifierProvider);
 
     return switch (collections) {
       AsyncLoading() => _List(fakeCollections, isLoading: true),

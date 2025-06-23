@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:tsks_flutter/data/exceptions/tsks_exception.dart';
+import 'package:tsks_flutter/ui/core/ui/tsks_snackbar.dart';
 
-class ErrorWidget extends StatelessWidget {
-  const ErrorWidget(this.exception, {this.child, super.key});
+class TsksErrorWidget extends StatelessWidget {
+  const TsksErrorWidget(this.exception, {this.child, super.key});
 
   final Object exception;
   final Widget? child;
 
   @override
   Widget build(BuildContext context) {
+    final message = errorMessage(exception);
     return Center(
       child: Column(
         children: [
           const SizedBox(height: 60),
-          if (exception is TsksException)
-            Text((exception as TsksException).message)
-          else
-            Text(exception.toString()),
+          Text(message),
           if (child != null) ...[
             const SizedBox(height: 20),
             child!,

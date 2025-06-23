@@ -39,22 +39,12 @@ final class CollectionsRepository {
   final DocumentReference<User> _userDocumentReference;
   final CollectionReference<Map<String, dynamic>> _collectionReference;
 
-  Future<Either<TsksException, Collection>> createCollection({
-    required String title,
-    bool? isFavourite = false,
-    int? colorARGB,
-    Map<String, dynamic>? iconMap,
-  }) async {
+  Future<Either<TsksException, Collection>> createCollection(
+    Collection collection,
+  ) async {
     try {
-      final documentReference = await _collectionReference.add({
-        'creator': _userDocumentReference.id,
-        'title': title,
-        'isFavourite': isFavourite ?? false,
-        'colorARGB': colorARGB,
-        'iconMap': iconMap,
-        'createdAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      final data = collection.toFirestore(creator: _userDocumentReference.id);
+      final documentReference = await _collectionReference.add(data);
 
       final snapshot = await documentReference.collectionConverter.get();
       final result = snapshot.data();

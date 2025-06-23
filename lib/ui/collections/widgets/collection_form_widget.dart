@@ -4,9 +4,9 @@ import 'package:flutter_iconpicker/Models/configuration.dart';
 import 'package:flutter_iconpicker/flutter_iconpicker.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:tsks_flutter/ui/collections/providers/all_collections.dart';
+import 'package:tsks_flutter/routing/router.dart';
 import 'package:tsks_flutter/ui/collections/providers/collection_form/collection_form_notifier.dart';
-import 'package:tsks_flutter/ui/collections/providers/collection_notifier.dart';
+import 'package:tsks_flutter/ui/collections/providers/collections_notifier.dart';
 import 'package:tsks_flutter/ui/collections/widgets/color_radio_button.dart';
 import 'package:tsks_flutter/ui/core/models/models.dart';
 import 'package:tsks_flutter/ui/core/ui/ui.dart';
@@ -18,32 +18,6 @@ class CollectionFormWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(GlobalKey<FormState>.new);
-    final status = ref.watch(
-      collectionFormNotifierProvider.select((s) => s.status),
-    );
-
-    ref.listen(collectionFormNotifierProvider, (previous, next) {
-      if (previous?.status == next.status) return;
-
-      if (next.status.isFailure) {
-        context.showErrorSnackBar(next.exception?.message);
-      }
-
-      if (next.status.isSuccess) {
-        final newOrUpdatedCollection = next.newCollection;
-        if (newOrUpdatedCollection != null) {
-          // Optimistically update the current collection
-          final id = newOrUpdatedCollection.id;
-          final notifier = ref.read(collectionNotifierProvider(id).notifier);
-          notifier.optimisticallyUpdate(newOrUpdatedCollection);
-
-          // Optimistically update the collections list
-          final colsNotifier = ref.read(allCollectionsProvider.notifier);
-          colsNotifier.optimisticallyUpdate(newOrUpdatedCollection);
-        }
-        Navigator.pop(context);
-      }
-    });
 
     return PopScope(
       onPopInvokedWithResult: (didPop, result) {
@@ -51,11 +25,11 @@ class CollectionFormWidget extends HookConsumerWidget {
       },
       child: Form(
         key: formKey,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
+        child: const SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(24, 32, 24, 32),
           child: Column(
             children: [
-              const Row(
+              Row(
                 spacing: 8,
                 children: [
                   _IconPickerField(key: Key('collectionForm_iconField')),
@@ -64,16 +38,16 @@ class CollectionFormWidget extends HookConsumerWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              const _ColorPickerField(key: Key('collectionForm_colorField')),
-              const SizedBox(height: 16),
-              const _IsFavouriteField(key: Key('collectionForm_isFavField')),
-              const SizedBox(height: 32),
+              SizedBox(height: 16),
+              _ColorPickerField(key: Key('collectionForm_colorField')),
+              SizedBox(height: 16),
+              _IsFavouriteField(key: Key('collectionForm_isFavField')),
+              SizedBox(height: 32),
               Row(
                 spacing: 16,
                 children: [
-                  const _SubmitButton(key: Key('collectionForm_submitButton')),
-                  CancelButton(enabled: !status.isInProgress),
+                  _SubmitButton(key: Key('collectionForm_submitButton')),
+                  CancelButton(),
                 ],
               ),
             ],
@@ -94,9 +68,7 @@ class _TitleField extends HookConsumerWidget {
     final title = ref.watch(
       collectionFormNotifierProvider.select((s) => s.title),
     );
-    final isInProgress = ref.watch(
-      collectionFormNotifierProvider.select((s) => s.status.isInProgress),
-    );
+
     return TextFormField(
       focusNode: focusNode,
       autofocus: true,
@@ -108,13 +80,6 @@ class _TitleField extends HookConsumerWidget {
       initialValue: title.value,
       onChanged: ref.read(collectionFormNotifierProvider.notifier).titleChanged,
       validator: (value) => title.error?.message,
-      enabled: !isInProgress,
-      onFieldSubmitted: (value) async {
-        if (Form.of(context).validate()) {
-          FocusScope.of(context).unfocus();
-          await ref.read(collectionFormNotifierProvider.notifier).submit();
-        }
-      },
     );
   }
 }
@@ -125,17 +90,12 @@ class _IsFavouriteField extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).colorScheme;
-    final status = ref.watch(
-      collectionFormNotifierProvider.select((s) => s.status),
-    );
+    final notifier = ref.read(collectionFormNotifierProvider.notifier);
     return CheckboxListTile(
       tileColor: colors.surfaceContainer,
       value: ref.watch(collectionFormNotifierProvider).isFavourite,
-      onChanged: ref
-          .read(collectionFormNotifierProvider.notifier)
-          .isFavouriteChanged,
+      onChanged: notifier.isFavouriteChanged,
       title: const Text('Add to favourite'),
-      enabled: !status.isInProgress,
       contentPadding: const EdgeInsets.fromLTRB(24, 5, 16, 5),
       shape: const RoundedSuperellipseBorder(
         borderRadius: BorderRadiusGeometry.all(Radius.circular(12)),
@@ -219,9 +179,8 @@ class _IconPickerField extends ConsumerWidget {
           );
           if (selectedIcon == null) return;
           final serializedIcon = serializeIcon(selectedIcon)!;
-          ref
-              .read(collectionFormNotifierProvider.notifier)
-              .iconChanged(serializedIcon);
+          final notifier = ref.read(collectionFormNotifierProvider.notifier);
+          notifier.iconChanged(serializedIcon);
         },
         style: IconButton.styleFrom(
           backgroundColor: colors.surfaceContainer,
@@ -243,38 +202,37 @@ class _IconPickerField extends ConsumerWidget {
   }
 }
 
-class _SubmitButton extends ConsumerWidget {
+class _SubmitButton extends HookConsumerWidget {
   const _SubmitButton({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isInProgress = ref.watch(
-      collectionFormNotifierProvider.select((s) => s.status.isInProgress),
-    );
+    final submitPressed = useState<bool>(false);
 
-    // Whether the form is in editing mode i.e. editing an existing collection
-    final isEditing = ref.watch(
-      collectionFormNotifierProvider.select((s) => s.isEditing),
-    );
-
-    // Whether the form state during when editing a collection has any changes
-    final hasChanges = ref.watch(
-      collectionFormNotifierProvider.select((s) => s.hasChanges),
-    );
+    final notifier = ref.read(collectionsNotifierProvider.notifier);
+    final state = ref.watch(collectionFormNotifierProvider);
 
     Future<void> submit() async {
       if (!Form.of(context).validate()) return;
-      await ref.watch(collectionFormNotifierProvider.notifier).submit();
+
+      FocusScope.of(context).unfocus();
+      submitPressed.value = true;
+
+      if (state.isEdit) {
+        await notifier.updateColleciton(state.initialCollection!);
+      } else {
+        await notifier.createCollection();
+      }
+
+      ref.read(routerConfigProvider).pop();
     }
 
     return SizedBox(
       height: 52,
       child: FilledButton(
         style: FilledButton.styleFrom(),
-        onPressed: isInProgress || !hasChanges ? null : submit,
-        child: isInProgress
-            ? const Text('Submitting...')
-            : Text(isEditing ? 'Update Collection' : 'Add Collection'),
+        onPressed: submitPressed.value || !state.hasChanges ? null : submit,
+        child: Text(state.isEdit ? 'Update Collection' : 'Add Collection'),
       ),
     );
   }

@@ -4,12 +4,12 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:tsks_flutter/constants/fake_models.dart';
 import 'package:tsks_flutter/models/collections/collection.dart';
-import 'package:tsks_flutter/ui/collections/providers/all_collections.dart';
+import 'package:tsks_flutter/ui/collections/providers/collections_notifier.dart';
 import 'package:tsks_flutter/ui/collections/providers/filtered_collections.dart';
 import 'package:tsks_flutter/ui/collections/widgets/add_new_collection_button.dart';
 import 'package:tsks_flutter/ui/collections/widgets/collection_category_selector_widget.dart';
 import 'package:tsks_flutter/ui/collections/widgets/collection_tile.dart';
-import 'package:tsks_flutter/ui/core/ui/error_widget.dart';
+import 'package:tsks_flutter/ui/core/ui/tsks_error_widget.dart';
 import 'package:tsks_flutter/ui/core/ui/ui.dart' hide Collection;
 
 class CollectionsPage extends ConsumerWidget {
@@ -17,28 +17,28 @@ class CollectionsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final allCollectionsAsync = ref.watch(allCollectionsProvider);
-    final filteredCollections = ref.watch(filteredCollectionsProvider);
+    final collectionsAsync = ref.watch(collectionsNotifierProvider);
+    final filteredAsync = ref.watch(filteredCollectionsProvider);
 
     return RefreshIndicator(
-      onRefresh: () => ref.refresh(allCollectionsProvider.future),
+      onRefresh: () => ref.refresh(collectionsNotifierProvider.future),
       child: PageWidget(
         title: 'Collections',
-        content: switch (allCollectionsAsync) {
-          AsyncError(:final error) => ErrorWidget(
-            error,
-            child: const AddNewCollectionButton(),
-          ),
-          AsyncData() => _CollectionsPageView(filteredCollections),
-          _ => _CollectionsPageView(fakeCollections, isLoading: true),
-        },
+        content: collectionsAsync.when(
+          loading: () => _PageView(fakeCollections, isLoading: true),
+          error: (error, _) => TsksErrorWidget(error),
+          data: (value) => switch (filteredAsync.filter) {
+            CollectionFilter.all => _PageView(filteredAsync.collections),
+            CollectionFilter.favourites => _PageView(filteredAsync.collections),
+          },
+        ),
       ),
     );
   }
 }
 
-class _CollectionsPageView extends ConsumerWidget {
-  const _CollectionsPageView(this.collections, {this.isLoading = false});
+class _PageView extends ConsumerWidget {
+  const _PageView(this.collections, {this.isLoading = false});
 
   final List<Collection?> collections;
   final bool isLoading;

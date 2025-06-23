@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:tsks_flutter/models/tasks/task.dart';
@@ -16,31 +14,21 @@ part 'filtered_tasks.g.dart';
 ///
 /// To get done tasks, set the [isDone] value to `true`.
 ///
-Stream<List<Task?>> filteredTasks(Ref ref, String? collectionId, bool isDone) {
+FutureOr<List<Task?>> filteredTasks(
+  Ref ref,
+  String? collectionId,
+  bool isDone,
+) {
   // If collectionId is null, immediately return an empty stream.
-  if (collectionId == null) return Stream.value([]);
+  if (collectionId == null) return [];
 
-  // Create a broadcast StreamController.
-  final controller = StreamController<List<Task?>>.broadcast();
+  final tasks = ref.watch(tasksNotifierProvider(collectionId)).valueOrNull;
+  if (tasks == null || tasks.isEmpty) return [];
 
-  // Ensure the controller is closed when the provider is disposed.
-  ref.onDispose(controller.close);
+  // Filter the tasks
+  final filteredTasks = tasks
+      .where((task) => task != null && task.isDone == isDone)
+      .toList();
 
-  // Listen to the TasksNotifierProvider.
-  ref.listen(
-    tasksNotifierProvider(collectionId),
-    (previous, next) {
-      // Filter the tasks
-      final filteredTasks = next.valueOrNull
-          ?.where((task) => task != null && task.isDone == isDone)
-          .toList();
-
-      // Add the filtered list to your stream
-      controller.add(filteredTasks ?? []);
-    },
-    fireImmediately: true,
-  );
-
-  // Return the stream from the controller.
-  return controller.stream;
+  return filteredTasks;
 }

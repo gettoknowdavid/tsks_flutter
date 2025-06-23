@@ -3,7 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tsks_flutter/models/collections/collection.dart';
 import 'package:tsks_flutter/routing/router.dart';
-import 'package:tsks_flutter/ui/collections/providers/all_collections.dart';
+import 'package:tsks_flutter/ui/collections/providers/collections_notifier.dart';
 import 'package:tsks_flutter/ui/core/models/models.dart';
 import 'package:tsks_flutter/ui/core/ui/cancel_button.dart';
 import 'package:tsks_flutter/ui/core/ui/date_form_field.dart';
@@ -93,7 +93,7 @@ class _CollectionField extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final collections = ref.watch(allCollectionsProvider);
+    final collections = ref.watch(collectionsNotifierProvider);
 
     final pathId = ref.watch(routerConfigProvider).state.pathParameters['id'];
 
@@ -148,22 +148,22 @@ class _SubmitButton extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final submitPressed = useState<bool>(false);
 
-    // Whether the form is in editing mode i.e. editing an existing todo
-    final isEdit = ref.watch(taskFormNotifierProvider.select((s) => s.isEdit));
-
-    // Whether the form state during when editing a todo has any changes
-    final hasChanges = ref.watch(
-      taskFormNotifierProvider.select((s) => s.hasChanges),
-    );
+    final state = ref.watch(taskFormNotifierProvider);
+    final collectionId = state.collection;
+    final notifier = ref.read(tasksNotifierProvider(collectionId).notifier);
 
     Future<void> submit() async {
       if (!Form.of(context).validate()) return;
+
       submitPressed.value = true;
       FocusScope.of(context).unfocus();
 
-      // Collection ID
-      final id = ref.read(taskFormNotifierProvider.select((s) => s.collection));
-      await ref.watch(tasksNotifierProvider(id).notifier).createTask();
+      if (state.isEdit) {
+        await notifier.updateTask(state.initialTask!);
+      } else {
+        await notifier.createTask();
+      }
+
       ref.read(routerConfigProvider).pop();
     }
 
@@ -171,8 +171,8 @@ class _SubmitButton extends HookConsumerWidget {
       height: 52,
       child: FilledButton(
         style: FilledButton.styleFrom(),
-        onPressed: submitPressed.value || !hasChanges ? null : submit,
-        child: Text(isEdit ? 'Update Task' : 'Add Task'),
+        onPressed: submitPressed.value || !state.hasChanges ? null : submit,
+        child: Text(state.isEdit ? 'Update Task' : 'Add Task'),
       ),
     );
   }

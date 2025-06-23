@@ -6,6 +6,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:tsks_flutter/routing/router.dart';
 import 'package:tsks_flutter/ui/collections/providers/collection_form/collection_form_notifier.dart';
 import 'package:tsks_flutter/ui/collections/providers/collection_notifier.dart';
+import 'package:tsks_flutter/ui/collections/providers/collections_notifier.dart';
 import 'package:tsks_flutter/ui/core/ui/page_widget.dart';
 import 'package:tsks_flutter/ui/core/ui/tsks_snackbar.dart';
 import 'package:tsks_flutter/ui/tasks/providers/task_form/task_form_notifier.dart';
@@ -178,8 +179,8 @@ class _MoreOptions extends ConsumerWidget {
                 '''You are about to delete this task. This aaction cannot be undone. Do you want to continue?''',
           );
           if (shouldDelete ?? false) {
-            final notifier = ref.read(collectionNotifierProvider(id).notifier);
-            await notifier.deleteCollection();
+            final notifier = ref.read(collectionsNotifierProvider.notifier);
+            await notifier.deleteCollection(collection);
             if (context.mounted) {
               await const CollectionsRoute().push<void>(context);
             } else {

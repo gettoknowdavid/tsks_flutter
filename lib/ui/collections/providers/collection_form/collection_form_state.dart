@@ -8,20 +8,14 @@ final class CollectionFormState with FormzMixin, EquatableMixin {
     this.isFavourite = false,
     this.color,
     this.iconMap,
-    this.status = Status.initial,
-    this.exception,
     this.initialCollection,
-    this.newCollection,
   });
 
   final CollectionTitle title;
   final bool isFavourite;
   final Color? color;
   final Map<String, dynamic>? iconMap;
-  final Status status;
-  final TsksException? exception;
   final Collection? initialCollection;
-  final Collection? newCollection;
 
   CollectionFormState withTitle(String title) {
     return CollectionFormState._(
@@ -73,42 +67,7 @@ final class CollectionFormState with FormzMixin, EquatableMixin {
     );
   }
 
-  CollectionFormState withSubmissionInProgress() {
-    return CollectionFormState._(
-      title: title,
-      color: color,
-      iconMap: iconMap,
-      isFavourite: isFavourite,
-      initialCollection: initialCollection,
-      status: Status.inProgress,
-    );
-  }
-
-  CollectionFormState withSubmissionFailure(TsksException exception) {
-    return CollectionFormState._(
-      title: title,
-      color: color,
-      iconMap: iconMap,
-      isFavourite: isFavourite,
-      initialCollection: initialCollection,
-      status: Status.failure,
-      exception: exception,
-    );
-  }
-
-  CollectionFormState withSubmissionSuccess(Collection newCollection) {
-    return CollectionFormState._(
-      title: title,
-      color: color,
-      iconMap: iconMap,
-      isFavourite: isFavourite,
-      status: Status.success,
-      initialCollection: initialCollection,
-      newCollection: newCollection,
-    );
-  }
-
-  bool get isEditing => initialCollection != null;
+  bool get isEdit => initialCollection != null;
 
   bool get hasChanges {
     return initialCollection?.title != title.value ||
@@ -126,10 +85,7 @@ final class CollectionFormState with FormzMixin, EquatableMixin {
     isFavourite,
     color,
     iconMap,
-    status,
-    exception,
     initialCollection,
-    newCollection,
   ];
 }
 

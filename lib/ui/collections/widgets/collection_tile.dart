@@ -5,7 +5,7 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'package:tsks_flutter/models/collections/collection.dart';
 import 'package:tsks_flutter/routing/router.dart';
 import 'package:tsks_flutter/ui/collections/providers/collection_form/collection_form_notifier.dart';
-import 'package:tsks_flutter/ui/collections/providers/collection_notifier.dart';
+import 'package:tsks_flutter/ui/collections/providers/collections_notifier.dart';
 import 'package:tsks_flutter/ui/collections/widgets/collection_icon_widget.dart';
 import 'package:tsks_flutter/ui/collections/widgets/collection_tasks_status_widget.dart';
 import 'package:tsks_flutter/ui/tasks/providers/task_form/task_form_notifier.dart';
@@ -22,9 +22,6 @@ class CollectionTile extends ConsumerWidget {
 
     final id = collection.id;
 
-    final collectionNotifier = ref.read(
-      collectionNotifierProvider(id).notifier,
-    );
     final collectionForm = ref.read(collectionFormNotifierProvider.notifier);
     final taskForm = ref.read(taskFormNotifierProvider.notifier);
 
@@ -41,7 +38,9 @@ class CollectionTile extends ConsumerWidget {
           );
 
           if (shouldDelete ?? false) {
-            await collectionNotifier.deleteCollection();
+            await ref
+                .read(collectionsNotifierProvider.notifier)
+                .deleteCollection(collection);
             if (context.mounted) {
               await const CollectionsRoute().push<void>(context);
             } else {

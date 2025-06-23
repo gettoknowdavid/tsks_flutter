@@ -9,11 +9,12 @@ part 'tasks_notifier.g.dart';
 
 @riverpod
 class TasksNotifier extends _$TasksNotifier {
+  TasksRepository get _repository => ref.read(tasksRepositoryProvider);
+
   @override
   FutureOr<List<Task?>> build(String? collection) async {
     if (collection == null) throw const NoCollectionFoundException();
-    final repository = ref.read(tasksRepositoryProvider);
-    final response = await repository.getTopLevelTasks(collection);
+    final response = await _repository.getTopLevelTasks(collection);
     return response.fold((exception) => throw exception, (tasks) => tasks);
   }
 
@@ -46,8 +47,7 @@ class TasksNotifier extends _$TasksNotifier {
     // Optimistically update the list with the new 'isDone' status
     optimisticallyUpdate(originalTask.copyWith(isDone: !originalTask.isDone));
 
-    final repository = ref.read(tasksRepositoryProvider);
-    final response = await repository.toggleIsDone(originalTask);
+    final response = await _repository.toggleIsDone(originalTask);
 
     state = response.fold(
       (exception) {
@@ -81,8 +81,7 @@ class TasksNotifier extends _$TasksNotifier {
       updatedAt: DateTime.now(),
     );
 
-    final repository = ref.read(tasksRepositoryProvider);
-    final result = await repository.createTask(newTask);
+    final result = await _repository.createTask(newTask);
 
     state = result.fold(
       (exception) {
@@ -107,8 +106,7 @@ class TasksNotifier extends _$TasksNotifier {
 
     optimisticallyDelete(task);
 
-    final repository = ref.read(tasksRepositoryProvider);
-    final response = await repository.deleteTask(task);
+    final response = await _repository.deleteTask(task);
 
     state = response.fold(
       (exception) {
@@ -136,8 +134,7 @@ class TasksNotifier extends _$TasksNotifier {
 
     optimisticallyUpdate(updatedTask);
 
-    final repository = ref.read(tasksRepositoryProvider);
-    final response = await repository.updateTask(
+    final response = await _repository.updateTask(
       originalTask: originalTask,
       updatedTask: updatedTask,
     );

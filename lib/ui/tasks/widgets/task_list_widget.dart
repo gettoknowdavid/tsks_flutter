@@ -14,7 +14,7 @@ class TaskListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Column(
-      spacing: 24,
+      spacing: 48,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _UndoneTasks(key: Key('UndoneTasksList')),
@@ -34,7 +34,7 @@ class _UndoneTasks extends ConsumerWidget {
     final undoneTasks = ref.watch(filteredTasksProvider(collectionId, false));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      spacing: 4,
+      spacing: 16,
       children: [
         const TaskCountWidget('Tasks'),
         switch (undoneTasks) {
@@ -58,7 +58,7 @@ class _DoneTasks extends ConsumerWidget {
     final doneTasks = ref.watch(filteredTasksProvider(collectionId, true));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      spacing: 4,
+      spacing: 16,
       children: [
         const TaskCountWidget('Completed', isDone: true),
         switch (doneTasks) {

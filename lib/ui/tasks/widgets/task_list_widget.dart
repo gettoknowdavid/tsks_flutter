@@ -4,7 +4,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:tsks_flutter/constants/fake_models.dart';
 import 'package:tsks_flutter/models/tasks/task.dart';
 import 'package:tsks_flutter/routing/router.dart';
-import 'package:tsks_flutter/ui/tasks/providers/tasks_notifier.dart';
+import 'package:tsks_flutter/ui/tasks/providers/filtered_tasks.dart';
 import 'package:tsks_flutter/ui/tasks/widgets/task_count_widget.dart';
 import 'package:tsks_flutter/ui/tasks/widgets/task_tile.dart';
 
@@ -31,9 +31,7 @@ class _UndoneTasks extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerConfigProvider);
     final collectionId = router.state.pathParameters['id'];
-    final undoneTasks = ref.watch(
-      tasksNotifierProvider(collectionId, isDone: false),
-    );
+    final undoneTasks = ref.watch(filteredTasksProvider(collectionId, false));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 4,
@@ -57,9 +55,7 @@ class _DoneTasks extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerConfigProvider);
     final collectionId = router.state.pathParameters['id'];
-    final doneTasks = ref.watch(
-      tasksNotifierProvider(collectionId, isDone: true),
-    );
+    final doneTasks = ref.watch(filteredTasksProvider(collectionId, true));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 4,

@@ -9,7 +9,6 @@ import 'package:tsks_flutter/data/exceptions/tsks_exception.dart';
 import 'package:tsks_flutter/data/repositories/collections/collections_repository.dart';
 import 'package:tsks_flutter/data/services/cloud_firestore.dart';
 import 'package:tsks_flutter/models/tasks/task.dart';
-import 'package:tsks_flutter/models/timestamp_converter.dart';
 import 'package:tsks_flutter/utils/get_model_difference.dart';
 
 part 'tasks_repository.g.dart';
@@ -38,27 +37,10 @@ final class TasksRepository {
     return _collectionReference.doc(collection).collection('tasks');
   }
 
-  Future<Either<TsksException, Task>> createTask({
-    required String collection,
-    required String title,
-    bool? isDone = false,
-    DateTime? dueDate,
-    String? parentTask,
-    String? assignee,
-  }) async {
+  Future<Either<TsksException, Task>> createTask(Task task) async {
     try {
-      final documentReference = await _taskReference(collection).add({
-        'collection': collection,
-        'title': title,
-        'isDone': isDone,
-        'parentTask': parentTask,
-        'assignee': assignee,
-        'dueDate': dueDate != null
-            ? TimestampConverter.toFirestore(dueDate)
-            : null,
-        'createdAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      final data = task.toFirestore();
+      final documentReference = await _taskReference(task.collection).add(data);
 
       final snapshot = await documentReference.taskConverter.get();
       final result = snapshot.data();
@@ -242,13 +224,7 @@ final class TasksRepository {
       );
 
       data['updatedAt'] = FieldValue.serverTimestamp();
-      log('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
-      log('ORIGINAL TASK => $task');
-      log('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
-      log('UPDATED TASK => $updatedTask');
-      log('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
-      log('UPDATED TASK DATA => $data');
-      log('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
+
       await _taskReference(task.collection).doc(task.id).update(data);
 
       return const Right(unit);

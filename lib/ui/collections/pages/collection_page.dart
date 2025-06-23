@@ -34,6 +34,16 @@ class CollectionPage extends ConsumerWidget {
       }
     });
 
+    ref.listen(tasksNotifierProvider(id), (previous, next) {
+      if (previous == next) return;
+      next.whenOrNull(
+        error: (error, stackTrace) {
+          final message = errorMessage(error);
+          context.showErrorSnackBar(message);
+        },
+      );
+    });
+
     final isMobile = ResponsiveBreakpoints.of(context).smallerThan(TABLET);
 
     final isTodoMoveInProgress = ref.watch(

@@ -25,8 +25,8 @@ class SubTaskListWidget extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 20),
       child: switch (subTasks) {
-        AsyncLoading() => TaskListBuilder(fakeTasks, isLoading: true),
-        AsyncData(:final value) => TaskListBuilder(value),
+        AsyncLoading() => _TaskListBuilder(fakeTasks, isLoading: true),
+        AsyncData(:final value) => _TaskListBuilder(value),
         AsyncError(:final error) => Text(error.toString()),
         _ => const SizedBox.shrink(),
       },
@@ -34,8 +34,8 @@ class SubTaskListWidget extends ConsumerWidget {
   }
 }
 
-class TaskListBuilder extends StatelessWidget {
-  const TaskListBuilder(this.tasks, {this.isLoading = false, super.key});
+class _TaskListBuilder extends StatelessWidget {
+  const _TaskListBuilder(this.tasks, {this.isLoading = false});
 
   final List<Task?> tasks;
   final bool isLoading;

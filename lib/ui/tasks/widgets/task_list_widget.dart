@@ -38,8 +38,8 @@ class _UndoneTasks extends ConsumerWidget {
       children: [
         const TaskCountWidget('Tasks'),
         switch (undoneTasks) {
-          AsyncLoading() => TaskListBuilder(fakeTasks, isLoading: true),
-          AsyncData(:final value) => TaskListBuilder(value),
+          AsyncLoading() => _TaskListBuilder(fakeTasks, isLoading: true),
+          AsyncData(:final value) => _TaskListBuilder(value),
           AsyncError(:final error) => Text(error.toString()),
           _ => const SizedBox.shrink(),
         },
@@ -62,8 +62,8 @@ class _DoneTasks extends ConsumerWidget {
       children: [
         const TaskCountWidget('Completed', isDone: true),
         switch (doneTasks) {
-          AsyncLoading() => TaskListBuilder(fakeTasks, isLoading: true),
-          AsyncData(:final value) => TaskListBuilder(value),
+          AsyncLoading() => _TaskListBuilder(fakeTasks, isLoading: true),
+          AsyncData(:final value) => _TaskListBuilder(value),
           AsyncError(:final error) => Text(error.toString()),
           _ => const SizedBox.shrink(),
         },
@@ -72,8 +72,8 @@ class _DoneTasks extends ConsumerWidget {
   }
 }
 
-class TaskListBuilder extends StatelessWidget {
-  const TaskListBuilder(this.tasks, {this.isLoading = false, super.key});
+class _TaskListBuilder extends StatelessWidget {
+  const _TaskListBuilder(this.tasks, {this.isLoading = false});
 
   final List<Task?> tasks;
   final bool isLoading;

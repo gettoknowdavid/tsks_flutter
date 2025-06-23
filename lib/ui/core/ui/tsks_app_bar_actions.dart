@@ -13,7 +13,6 @@ class TsksAppBarActions extends ConsumerWidget {
       spacing: 8,
       children: [
         const AddTaskButton(),
-        const SizedBox(width: 4),
         IconButton(
           onPressed: () => const SearchRoute().go(context),
           iconSize: 18,

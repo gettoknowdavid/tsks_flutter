@@ -7,7 +7,7 @@ import 'package:uuid/uuid.dart';
 
 part 'tasks_notifier.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class TasksNotifier extends _$TasksNotifier {
   TasksRepository get _repository => ref.read(tasksRepositoryProvider);
 

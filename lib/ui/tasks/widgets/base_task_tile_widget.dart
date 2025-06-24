@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:tsks_flutter/models/tasks/task.dart';
+import 'package:tsks_flutter/ui/tasks/providers/sub_task_count_notifier.dart';
+import 'package:tsks_flutter/ui/tasks/providers/sub_tasks_notifier.dart';
 import 'package:tsks_flutter/ui/tasks/providers/task_form/task_form_notifier.dart';
 import 'package:tsks_flutter/ui/tasks/providers/tasks_notifier.dart';
 import 'package:tsks_flutter/ui/tasks/widgets/task_extensions.dart';
@@ -66,12 +68,13 @@ class BaseTaskTileWidget extends ConsumerWidget {
                 Row(
                   spacing: 12,
                   children: [
-                    _TaskCheckboxWidget(task: task),
+                    if (task.parentTask == null)
+                      _TaskCheckboxWidget(task: task),
                     Expanded(child: _TaskTitleWidget(task: task)),
                     trailing ?? const SizedBox.shrink(),
                   ],
                 ),
-                _TaskSubtileWidget(task: task),
+                _TaskSubtitleWidget(task: task),
               ],
             ),
           ),
@@ -88,7 +91,8 @@ class _TaskCheckboxWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notifier = ref.read(tasksNotifierProvider(task.collection).notifier);
+    final id = task.id;
+    final cId = task.collection;
     return Skeleton.shade(
       child: Transform.scale(
         scale: 1.4,
@@ -96,7 +100,20 @@ class _TaskCheckboxWidget extends ConsumerWidget {
           dimension: 24,
           child: Checkbox(
             value: task.isDone,
-            onChanged: (value) => notifier.isTaskChanged(task),
+            onChanged: (value) {
+              if (task.parentTask == null) {
+                final notifier = ref.read(tasksNotifierProvider(cId).notifier);
+                notifier.isTaskChanged(task);
+              } else {
+                final notifier = ref.read(
+                  subTasksNotifierProvider(
+                    parentTask: id,
+                    collection: cId,
+                  ).notifier,
+                );
+                notifier.isTaskChanged(task);
+              }
+            },
           ),
         ),
       ),
@@ -125,33 +142,106 @@ class _TaskTitleWidget extends StatelessWidget {
   }
 }
 
-class _TaskSubtileWidget extends StatelessWidget {
-  const _TaskSubtileWidget({required this.task});
+class _TaskSubtitleWidget extends StatelessWidget {
+  const _TaskSubtitleWidget({required this.task});
 
   final Task task;
 
   @override
   Widget build(BuildContext context) {
-    if (task.dueDate == null) return const SizedBox();
-
-    final textTheme = Theme.of(context).textTheme;
-    final formattedDate = DateFormat.yMEd().format(task.dueDate!);
-    const success = Colors.green;
     return Padding(
       padding: const EdgeInsets.fromLTRB(32, 0, 8, 0),
       child: Row(
+        spacing: 16,
+        children: [
+          _SubTaskCountWidget(task, key: const Key('TaskSubTaskCountWidget')),
+          _TaskDueDateWidget(task, key: const Key('TaskDueDateWidget')),
+        ],
+      ),
+    );
+  }
+}
+
+class _SubTaskCountWidget extends ConsumerWidget {
+  const _SubTaskCountWidget(this.task, {super.key});
+
+  final Task task;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final collection = task.collection;
+    final parentTask = task.id;
+
+    if (task.parentTask != null) return const SizedBox.shrink();
+
+    // Total sub-tasks count
+    final totalAsync = ref.watch(
+      subTaskCountNotifierProvider(
+        collection: collection,
+        parentTask: parentTask,
+        title: 'Total',
+      ),
+    );
+
+    // Done sub-task count
+    final doneAsync = ref.watch(
+      subTaskCountNotifierProvider(
+        collection: collection,
+        parentTask: parentTask,
+        title: 'Done',
+        isDone: true,
+      ),
+    );
+
+    final isLoading = totalAsync.isLoading || doneAsync.isLoading;
+
+    final totalSubTasks = totalAsync.value ?? 0;
+    final doneSubTasks = doneAsync.value ?? 0;
+
+    final theme = Theme.of(context);
+
+    return Skeletonizer(
+      enabled: isLoading,
+      child: Row(
         spacing: 4,
         children: [
-          const Icon(Icons.calendar_today, color: success, size: 12),
+          const Icon(PhosphorIconsBold.treeView, size: 12),
           Text(
-            formattedDate,
-            style: textTheme.labelSmall?.copyWith(
-              color: success,
-              fontWeight: FontWeight.w700,
+            '$doneSubTasks/$totalSubTasks',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _TaskDueDateWidget extends StatelessWidget {
+  const _TaskDueDateWidget(this.task, {super.key});
+
+  final Task task;
+
+  @override
+  Widget build(BuildContext context) {
+    if (task.dueDate == null) return const SizedBox.shrink();
+
+    final textTheme = Theme.of(context).textTheme;
+    final formattedDate = DateFormat.yMEd().format(task.dueDate!);
+    const success = Colors.green;
+    return Row(
+      spacing: 4,
+      children: [
+        const Icon(Icons.calendar_today, color: success, size: 12),
+        Text(
+          formattedDate,
+          style: textTheme.labelSmall?.copyWith(
+            color: success,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
     );
   }
 }

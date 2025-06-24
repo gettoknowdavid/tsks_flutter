@@ -113,6 +113,34 @@ final class TasksRepository {
     }
   }
 
+  Future<Either<TsksException, int>> getNumberOfSubTasks({
+    required String collection,
+    required String parentTask,
+    bool? isDone,
+  }) async {
+    try {
+      AggregateQuery aggregateQuery;
+
+      if (isDone == null) {
+        aggregateQuery = _taskReference(
+          collection,
+        ).where('parentTask', isEqualTo: parentTask).count();
+      } else {
+        aggregateQuery = _taskReference(collection)
+            .where('parentTask', isEqualTo: parentTask)
+            .where('isDone', isEqualTo: isDone)
+            .count();
+      }
+
+      final countQuery = await aggregateQuery.get();
+      return Right(countQuery.count ?? 0);
+    } on TimeoutException {
+      return const Left(TsksTimeoutException());
+    } on Exception catch (e) {
+      return Left(TsksException(e.toString()));
+    }
+  }
+
   Future<Either<TsksException, List<Task?>>> getSubTasks({
     required String collection,
     required String parentTask,

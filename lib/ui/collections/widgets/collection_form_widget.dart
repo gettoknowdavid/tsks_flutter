@@ -28,6 +28,7 @@ class CollectionFormWidget extends HookConsumerWidget {
         child: const SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(24, 32, 24, 32),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Row(
                 spacing: 8,

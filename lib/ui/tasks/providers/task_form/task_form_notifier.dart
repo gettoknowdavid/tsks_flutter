@@ -17,8 +17,6 @@ class TaskFormNotifier extends _$TaskFormNotifier {
     state = state.withCollection(collection);
   }
 
-  void parentTaskChanged(Task todo) => state = state.withParentTask(todo);
-
   void titleChanged(String title) => state = state.withTitle(title);
 
   void isDoneChanged(bool? value) => state = state.withIsDone(value);

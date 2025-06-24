@@ -112,6 +112,8 @@ abstract final class TsksTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         contentPadding: const EdgeInsets.fromLTRB(22, 20, 22, 20),
+        filled: true,
+        fillColor: colorScheme.surfaceContainer,
         border: OutlineInputBorder(
           borderRadius: const BorderRadius.all(Radius.circular(12)),
           borderSide: BorderSide(width: 2, color: colorScheme.outlineVariant),

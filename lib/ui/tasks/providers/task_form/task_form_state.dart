@@ -9,8 +9,6 @@ final class TaskFormState with FormzMixin, EquatableMixin {
     this.isDone = false,
     this.dueDate,
     this.initialTask,
-    this.newTask,
-    this.parentTask,
   });
 
   final String collection;
@@ -18,8 +16,6 @@ final class TaskFormState with FormzMixin, EquatableMixin {
   final bool isDone;
   final DateTime? dueDate;
   final Task? initialTask;
-  final Task? newTask;
-  final Task? parentTask;
 
   TaskFormState withCollection(String value) {
     return TaskFormState._(
@@ -28,7 +24,6 @@ final class TaskFormState with FormzMixin, EquatableMixin {
       isDone: isDone,
       dueDate: dueDate,
       initialTask: initialTask,
-      parentTask: parentTask,
     );
   }
 
@@ -39,7 +34,6 @@ final class TaskFormState with FormzMixin, EquatableMixin {
       isDone: isDone,
       dueDate: dueDate,
       initialTask: initialTask,
-      parentTask: value,
     );
   }
 
@@ -50,7 +44,6 @@ final class TaskFormState with FormzMixin, EquatableMixin {
       isDone: isDone,
       dueDate: dueDate,
       initialTask: initialTask,
-      parentTask: parentTask,
     );
   }
 
@@ -61,7 +54,6 @@ final class TaskFormState with FormzMixin, EquatableMixin {
       isDone: value ?? false,
       dueDate: dueDate,
       initialTask: initialTask,
-      parentTask: parentTask,
     );
   }
 
@@ -72,7 +64,6 @@ final class TaskFormState with FormzMixin, EquatableMixin {
       isDone: isDone,
       dueDate: value,
       initialTask: initialTask,
-      parentTask: parentTask,
     );
   }
 
@@ -83,7 +74,6 @@ final class TaskFormState with FormzMixin, EquatableMixin {
       isDone: value.isDone,
       dueDate: value.dueDate,
       initialTask: value,
-      parentTask: parentTask,
     );
   }
 
@@ -103,7 +93,6 @@ final class TaskFormState with FormzMixin, EquatableMixin {
     isDone,
     dueDate,
     initialTask,
-    newTask,
   ];
 
   @override

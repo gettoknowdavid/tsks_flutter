@@ -27,7 +27,7 @@ FutureOr<List<Task?>> filteredTasks(
 
   // Filter the tasks
   final filteredTasks = tasks
-      .where((t) => t != null && t.isDone == isDone && t.parentTask == null)
+      .where((t) => t != null && t.isDone == isDone)
       .toList();
 
   return filteredTasks;

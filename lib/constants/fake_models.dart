@@ -31,7 +31,6 @@ final List<Task> fakeTasks = List.generate(
     title: BoneMock.title,
     collection: '3',
     assignee: '4',
-    parentTask: '5',
     createdAt: DateTime.now(),
     updatedAt: DateTime.now(),
     dueDate: DateTime.now(),

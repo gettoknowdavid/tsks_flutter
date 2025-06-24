@@ -46,11 +46,6 @@ class TaskTile extends ConsumerWidget {
           if (shouldDelete ?? false) {
             await tasksNotifier.deleteTask(task);
           }
-        case 'add_sub_task':
-          if (task.parentTask != null) return;
-          taskFormNotifier.parentTaskChanged(task);
-          taskFormNotifier.collectionChanged(task.collection);
-          await context.openTaskEditor(parentTask: task);
       }
     }
 

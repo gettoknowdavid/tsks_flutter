@@ -56,31 +56,7 @@ final class TasksRepository {
 
   Future<Either<TsksException, Unit>> deleteTask(Task task) async {
     try {
-      final taskId = task.id;
-      final collectionId = task.collection;
-      if (task.parentTask == null) {
-        // Top-level task: need to also delete its sub-collection
-        await _firestore.runTransaction((transaction) async {
-          final parentTaskReference = _taskReference(collectionId).doc(taskId);
-
-          // Delete the top-level task itself
-          transaction.delete(parentTaskReference);
-
-          //  Find and delete all sub-tasks that belong to this top-level task
-          //  We query the same 'tasks' collection for documents where
-          //  'parentTask' matches the top-level task's UID.
-          final subTasksSnapshot = await _taskReference(
-            collectionId,
-          ).where('parentTask', isEqualTo: taskId).get();
-
-          for (final doc in subTasksSnapshot.docs) {
-            transaction.delete(doc.reference);
-          }
-        });
-      } else {
-        // This is a sub-task: Just delete this single task.
-        await _taskReference(collectionId).doc(taskId).delete();
-      }
+      await _taskReference(task.collection).doc(task.id).delete();
       return const Right(unit);
     } on TimeoutException {
       return const Left(TsksTimeoutException());

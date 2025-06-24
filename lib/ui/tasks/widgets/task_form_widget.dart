@@ -24,7 +24,7 @@ class TaskFormWidget extends HookConsumerWidget {
       },
       child: Form(
         key: formKey,
-        child: const Padding(
+        child: const SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(24, 32, 24, 32),
           child: Column(
             children: [
@@ -61,29 +61,16 @@ class _TitleField extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colors = Theme.of(context).colorScheme;
     final focusNode = useFocusNode();
     final title = ref.watch(taskFormNotifierProvider.select((s) => s.title));
-
-    // Collection ID
-    final cId = ref.read(taskFormNotifierProvider.select((s) => s.collection));
 
     return TextFormField(
       focusNode: focusNode,
       autofocus: true,
-      decoration: InputDecoration(
-        hintText: 'Task title',
-        fillColor: colors.surfaceContainer,
-        filled: true,
-      ),
+      decoration: const InputDecoration(hintText: 'Task title'),
       initialValue: title.value,
       onChanged: ref.read(taskFormNotifierProvider.notifier).titleChanged,
       validator: (value) => title.error?.message,
-      onFieldSubmitted: (value) async {
-        if (!Form.of(context).validate()) return;
-        FocusScope.of(context).unfocus();
-        await ref.read(tasksNotifierProvider(cId).notifier).createTask();
-      },
     );
   }
 }

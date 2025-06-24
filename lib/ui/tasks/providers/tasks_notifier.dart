@@ -75,7 +75,6 @@ class TasksNotifier extends _$TasksNotifier {
       id: tempId,
       collection: taskForm.collection,
       title: taskForm.title.value,
-      parentTask: taskForm.parentTask?.id,
       dueDate: taskForm.dueDate,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
@@ -128,7 +127,6 @@ class TasksNotifier extends _$TasksNotifier {
       isDone: taskForm.isDone,
       dueDate: taskForm.dueDate,
       collection: taskForm.collection,
-      parentTask: taskForm.parentTask?.id,
       updatedAt: DateTime.now(),
     );
 

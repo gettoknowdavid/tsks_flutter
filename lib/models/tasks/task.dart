@@ -13,7 +13,6 @@ final class Task with EquatableMixin {
     this.isDone = false,
     this.dueDate,
     this.updatedAt,
-    this.parentTask,
     this.assignee,
   });
 
@@ -26,9 +25,6 @@ final class Task with EquatableMixin {
       isDone: json['isDone'] as bool? ?? false,
       dueDate: json['dueDate'] != null
           ? TimestampConverter.fromFirestore(json['dueDate'] as Timestamp)
-          : null,
-      parentTask: json['parentTask'] != null
-          ? json['parentTask'] as String
           : null,
       assignee: json['assignee'] != null ? json['assignee'] as String : null,
       createdAt: TimestampConverter.fromFirestore(
@@ -47,7 +43,6 @@ final class Task with EquatableMixin {
     'dueDate': dueDate != null
         ? TimestampConverter.toFirestore(dueDate!)
         : null,
-    'parentTask': parentTask,
     'assignee': assignee,
     'createdAt': FieldValue.serverTimestamp(),
     'updatedAt': FieldValue.serverTimestamp(),
@@ -76,9 +71,6 @@ final class Task with EquatableMixin {
   /// Time the task object was updated
   final DateTime? updatedAt;
 
-  /// ID of the a parent task, making this current task a sub-task
-  final String? parentTask;
-
   /// ID of the user the task is assigned to, if any
   final String? assignee;
 
@@ -91,7 +83,6 @@ final class Task with EquatableMixin {
     dueDate,
     createdAt,
     updatedAt,
-    parentTask,
     assignee,
   ];
 
@@ -100,7 +91,6 @@ final class Task with EquatableMixin {
     String? title,
     bool? isDone,
     DateTime? dueDate,
-    String? parentTask,
     String? assignee,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -111,7 +101,6 @@ final class Task with EquatableMixin {
       title: title ?? this.title,
       isDone: isDone ?? this.isDone,
       dueDate: dueDate ?? this.dueDate,
-      parentTask: parentTask ?? this.parentTask,
       assignee: assignee ?? this.assignee,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -123,7 +112,6 @@ final class Task with EquatableMixin {
     'title': (Task t) => t.title,
     'isDone': (Task t) => t.isDone,
     'dueDate': (Task t) => t.dueDate,
-    'parentTask': (Task t) => t.parentTask,
     'assignee': (Task t) => t.assignee,
   };
 

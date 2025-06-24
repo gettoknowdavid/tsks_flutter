@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:tsks_flutter/models/tasks/task.dart';
 import 'package:tsks_flutter/ui/tasks/providers/task_form/task_form_notifier.dart';
 import 'package:tsks_flutter/ui/tasks/providers/task_mover_notifier.dart';
 import 'package:tsks_flutter/ui/tasks/providers/tasks_notifier.dart';
-import 'package:tsks_flutter/ui/tasks/widgets/base_task_tile_widget.dart';
-import 'package:tsks_flutter/ui/tasks/widgets/sub_task_list_widget.dart';
 import 'package:tsks_flutter/ui/tasks/widgets/task_extensions.dart';
 
-class TaskTile extends HookConsumerWidget {
+class TaskTile extends ConsumerWidget {
   const TaskTile({
     required this.task,
     this.padding = const EdgeInsets.all(16),
@@ -22,14 +21,10 @@ class TaskTile extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isExpanded = useState<bool>(false);
-
     final collection = task.collection;
     final tasksNotifier = ref.read(tasksNotifierProvider(collection).notifier);
     final taskFormNotifier = ref.read(taskFormNotifierProvider.notifier);
     final taskMoverNotifier = ref.read(taskMoverNotifierProvider.notifier);
-
-    final isSubTask = task.parentTask != null;
 
     Future<void> handleMenuSelection(String choice) async {
       switch (choice) {
@@ -59,48 +54,74 @@ class TaskTile extends HookConsumerWidget {
       }
     }
 
-    return Column(
-      children: [
-        BaseTaskTileWidget(
-          task: task,
-          onLongPress: () async {
-            final choice = await _optionsMenu(context, isSubTask: isSubTask);
-            if (choice != null) await handleMenuSelection(choice);
-          },
-          onSecondaryTapDown: (details) => _showContextMenu(
-            context,
-            details,
-            handleMenuSelection,
-            isSubTask: isSubTask,
-          ),
-          trailing: isSubTask
-              ? null
-              : IconButton(
-                  onPressed: () => isExpanded.value = !isExpanded.value,
-                  iconSize: 16,
-                  icon: isExpanded.value
-                      ? const Icon(PhosphorIconsBold.caretUp)
-                      : const Icon(PhosphorIconsBold.caretDown),
-                ),
+    return Dismissible(
+      key: ValueKey<String>(task.id),
+      background: const _DismissedContainer(),
+      direction: DismissDirection.endToStart,
+      onDismissed: (direction) => switch (direction) {
+        DismissDirection.endToStart => tasksNotifier.deleteTask(task),
+        _ => null,
+      },
+      confirmDismiss: (direction) async {
+        if (direction == DismissDirection.endToStart) {
+          return context.showConfirmationDialog(
+            title: 'Delete Task?',
+            description: 'This action cannot be undone.',
+          );
+        }
+        return null;
+      },
+      child: InkWell(
+        borderRadius: const BorderRadius.all(Radius.circular(20)),
+        onSecondaryTapDown: (details) => _showContextMenu(
+          context,
+          details,
+          handleMenuSelection,
         ),
-        if (!isSubTask)
-          if (isExpanded.value) ...[
-            const SizedBox(height: 6),
-            SubTaskListWidget(
-              collection: task.collection,
-              parentTask: task.id,
+        onLongPress: () async {
+          final choice = await _optionsMenu(context);
+          if (choice != null) await handleMenuSelection(choice);
+        },
+        onTap: () {
+          taskFormNotifier.initializeWithTask(task);
+          context.openTaskEditor();
+        },
+        child: Card(
+          child: Padding(
+            padding: padding,
+            child: Column(
+              spacing: 4,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  spacing: 12,
+                  children: [
+                    _TaskCheckboxWidget(
+                      task,
+                      key: const Key('TaskCheckboxWidget'),
+                    ),
+                    Expanded(
+                      child: _TaskTitleWidget(
+                        task,
+                        key: const Key('TaskTitleWidget'),
+                      ),
+                    ),
+                  ],
+                ),
+                _TaskDueDateWidget(task, key: const Key('TaskDueDateWidget')),
+              ],
             ),
-          ],
-      ],
+          ),
+        ),
+      ),
     );
   }
 
   Future<void> _showContextMenu(
     BuildContext context,
     TapDownDetails details,
-    void Function(String) onSelected, {
-    bool isSubTask = false,
-  }) async {
+    void Function(String) onSelected,
+  ) async {
     final globalPosition = details.globalPosition;
     final position = RelativeRect.fromLTRB(
       globalPosition.dx,
@@ -109,18 +130,13 @@ class TaskTile extends HookConsumerWidget {
       globalPosition.dy,
     );
 
-    final choice = await _optionsMenu(
-      context,
-      isSubTask: isSubTask,
-      position: position,
-    );
+    final choice = await _optionsMenu(context, position: position);
     if (choice != null) onSelected(choice);
   }
 
   Future<String?> _optionsMenu(
     BuildContext context, {
     RelativeRect? position,
-    bool isSubTask = false,
   }) async {
     final colors = Theme.of(context).colorScheme;
     return showMenu<String>(
@@ -132,14 +148,6 @@ class TaskTile extends HookConsumerWidget {
         side: BorderSide(width: 2, color: colors.secondaryContainer),
       ),
       items: <PopupMenuEntry<String>>[
-        PopupMenuItem<String>(
-          value: 'add_sub_task',
-          enabled: !isSubTask,
-          child: const ListTile(
-            leading: Icon(PhosphorIconsBold.checkSquare),
-            title: Text('Add Sub-Task'),
-          ),
-        ),
         const PopupMenuItem<String>(
           value: 'edit',
           child: ListTile(
@@ -164,6 +172,100 @@ class TaskTile extends HookConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _TaskCheckboxWidget extends ConsumerWidget {
+  const _TaskCheckboxWidget(this.task, {super.key});
+
+  final Task task;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Skeleton.shade(
+      child: Transform.scale(
+        scale: 1.4,
+        child: SizedBox.square(
+          dimension: 24,
+          child: Checkbox(
+            value: task.isDone,
+            onChanged: (value) {
+              final cId = task.collection;
+              final notifier = ref.read(tasksNotifierProvider(cId).notifier);
+              notifier.isTaskChanged(task);
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TaskTitleWidget extends StatelessWidget {
+  const _TaskTitleWidget(this.task, {super.key});
+
+  final Task task;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Text(
+      task.title,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: theme.textTheme.titleMedium?.copyWith(
+        fontWeight: FontWeight.w500,
+        color: theme.colorScheme.onSurfaceVariant,
+        decoration: task.isDone ? TextDecoration.lineThrough : null,
+      ),
+    );
+  }
+}
+
+class _TaskDueDateWidget extends StatelessWidget {
+  const _TaskDueDateWidget(this.task, {super.key});
+
+  final Task task;
+
+  @override
+  Widget build(BuildContext context) {
+    if (task.dueDate == null) return const SizedBox.shrink();
+
+    final textTheme = Theme.of(context).textTheme;
+    final formattedDate = DateFormat.yMEd().format(task.dueDate!);
+    const success = Colors.green;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(32, 0, 8, 0),
+      child: Row(
+        spacing: 4,
+        children: [
+          const Icon(Icons.calendar_today, color: success, size: 12),
+          Text(
+            formattedDate,
+            style: textTheme.labelSmall?.copyWith(
+              color: success,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DismissedContainer extends StatelessWidget {
+  const _DismissedContainer();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.centerRight,
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Icon(
+        PhosphorIconsRegular.trash,
+        color: Theme.of(context).colorScheme.error,
+      ),
     );
   }
 }
